@@ -1,0 +1,283 @@
+[
+    {
+        "inputs": [
+            {
+                "internalType": "uint256",
+                "name": "_nativeRate",
+                "type": "uint256"
+            },
+            {
+                "internalType": "uint256",
+                "name": "_tokenRate",
+                "type": "uint256"
+            },
+            {
+                "internalType": "address",
+                "name": "_paymentToken",
+                "type": "address"
+            },
+            {
+                "internalType": "address",
+                "name": "_receiver",
+                "type": "address"
+            },
+            {
+                "internalType": "address",
+                "name": "_icoToken",
+                "type": "address"
+            }
+        ],
+        "stateMutability": "nonpayable",
+        "type": "constructor"
+    },
+    {
+        "anonymous": false,
+        "inputs": [
+            {
+                "indexed": false,
+                "internalType": "uint256",
+                "name": "_newNativeRate",
+                "type": "uint256"
+            }
+        ],
+        "name": "NativeRateChanged",
+        "type": "event"
+    },
+    {
+        "anonymous": false,
+        "inputs": [
+            {
+                "indexed": true,
+                "internalType": "address",
+                "name": "previousOwner",
+                "type": "address"
+            },
+            {
+                "indexed": true,
+                "internalType": "address",
+                "name": "newOwner",
+                "type": "address"
+            }
+        ],
+        "name": "OwnershipTransferred",
+        "type": "event"
+    },
+    {
+        "anonymous": false,
+        "inputs": [
+            {
+                "indexed": false,
+                "internalType": "contract IERC20",
+                "name": "_newToken",
+                "type": "address"
+            }
+        ],
+        "name": "PaymentTokenChanged",
+        "type": "event"
+    },
+    {
+        "anonymous": false,
+        "inputs": [
+            {
+                "indexed": false,
+                "internalType": "address",
+                "name": "_newReceiver",
+                "type": "address"
+            }
+        ],
+        "name": "ReceiverAddressChanged",
+        "type": "event"
+    },
+    {
+        "anonymous": false,
+        "inputs": [
+            {
+                "indexed": false,
+                "internalType": "uint256",
+                "name": "_newTokenRate",
+                "type": "uint256"
+            }
+        ],
+        "name": "TokenRateChanged",
+        "type": "event"
+    },
+    {
+        "inputs": [],
+        "name": "PERCENTAGE_FRACTION",
+        "outputs": [
+            { "internalType": "uint256", "name": "", "type": "uint256" }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [],
+        "name": "buyByNative",
+        "outputs": [],
+        "stateMutability": "payable",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            { "internalType": "uint256", "name": "_amount", "type": "uint256" }
+        ],
+        "name": "buyByToken",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "address",
+                "name": "_payment",
+                "type": "address"
+            },
+            { "internalType": "uint256", "name": "_amount", "type": "uint256" }
+        ],
+        "name": "getICOTokenAmount",
+        "outputs": [
+            { "internalType": "bool", "name": "success", "type": "bool" },
+            { "internalType": "uint256", "name": "value", "type": "uint256" }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [],
+        "name": "ico_token",
+        "outputs": [
+            { "internalType": "contract IERC20", "name": "", "type": "address" }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [],
+        "name": "native_rate",
+        "outputs": [
+            { "internalType": "uint256", "name": "", "type": "uint256" }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [],
+        "name": "owner",
+        "outputs": [
+            { "internalType": "address", "name": "", "type": "address" }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [],
+        "name": "payment_token",
+        "outputs": [
+            { "internalType": "contract IERC20", "name": "", "type": "address" }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [],
+        "name": "receiver_address",
+        "outputs": [
+            { "internalType": "address", "name": "", "type": "address" }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [],
+        "name": "renounceOwnership",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "uint256",
+                "name": "_nativeRate",
+                "type": "uint256"
+            }
+        ],
+        "name": "setNativeRate",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "contract IERC20",
+                "name": "_newToken",
+                "type": "address"
+            }
+        ],
+        "name": "setPaymentToken",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "address",
+                "name": "_receiver",
+                "type": "address"
+            }
+        ],
+        "name": "setReceiverAddress",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "uint256",
+                "name": "_tokenRate",
+                "type": "uint256"
+            }
+        ],
+        "name": "setTokenRate",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [],
+        "name": "token_rate",
+        "outputs": [
+            { "internalType": "uint256", "name": "", "type": "uint256" }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            { "internalType": "address", "name": "newOwner", "type": "address" }
+        ],
+        "name": "transferOwnership",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [],
+        "name": "withdrawNative",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [],
+        "name": "withdrawToken",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    { "stateMutability": "payable", "type": "receive" }
+]
