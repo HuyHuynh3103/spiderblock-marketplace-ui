@@ -1,5 +1,5 @@
 import { ethers } from "ethers";
-import ConversionHelper from "../helper/conversion";
+import { ConversionHelper } from "../helper";
 import BaseInterface from "./BaseInterface";
 
 class Erc20 extends BaseInterface {

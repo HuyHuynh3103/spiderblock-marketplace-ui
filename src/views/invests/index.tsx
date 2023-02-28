@@ -1,18 +1,29 @@
 declare var window: any;
-import { ConnectWallet, WalletInfo } from "@/src/components";
-import InvestCard from "@/src/components/InvestCard";
+import { ConnectWallet, SuccessModal, WalletInfo } from "@/src/components";
 import { packages } from "@/src/constants";
+import CrowSaleContract from "@/src/contracts/CrowdSaleContract";
+import UsdtContract from "@/src/contracts/UsdtContract";
 import { EToken, IPackage, IRate, IWalletInfo } from "@/src/_types_";
-import { Flex, Heading, SimpleGrid, Spacer } from "@chakra-ui/react";
+import {
+    Flex,
+    Heading,
+    SimpleGrid,
+    Spacer,
+    useDisclosure,
+} from "@chakra-ui/react";
 import { ethers } from "ethers";
 import React from "react";
+import { InvestCard } from "../components";
 
 export default function InvestView() {
     const [wallet, setWallet] = React.useState<IWalletInfo>();
     const [isProcessing, setIsProcessing] = React.useState<boolean>(false);
-    const [rate, setRate] = React.useState<IRate>({bnbRate: 0, usdtRate: 0});
-	
-	const [web3Provider, setWeb3Provider] = React.useState<ethers.providers.Web3Provider>();
+    const [pak, setPak] = React.useState<IPackage>();
+    const [rate, setRate] = React.useState<IRate>({ bnbRate: 0, usdtRate: 0 });
+    const [txHash, setTxHash] = React.useState<string>();
+    const { isOpen, onOpen, onClose } = useDisclosure();
+    const [web3Provider, setWeb3Provider] =
+        React.useState<ethers.providers.Web3Provider>();
     const onConnectMetamask = async () => {
         if (window.ethereum) {
             const provider = new ethers.providers.Web3Provider(
@@ -23,17 +34,54 @@ export default function InvestView() {
             const signer = await provider.getSigner();
             const address = await signer.getAddress();
             const bigBalance = await signer.getBalance();
-            const nativeBalance = Number.parseFloat(ethers.utils.formatEther(bigBalance));
-			setWeb3Provider(provider)
-			setWallet({
-				address,
-				nativeAmt: nativeBalance
-			})
+            const nativeBalance = Number.parseFloat(
+                ethers.utils.formatEther(bigBalance)
+            );
+            setWeb3Provider(provider);
+            setWallet({
+                address,
+                nativeAmt: nativeBalance,
+            });
         }
     };
-	const handleBuyIco = (pak: IPackage) => {
-
-	}
+    const handleBuyIco = async (pak: IPackage) => {
+        if (!web3Provider) return;
+        setPak(pak);
+        setIsProcessing(true);
+        let hash = "";
+        const crowdContract = new CrowSaleContract(web3Provider);
+        switch (pak.token) {
+            case EToken.BNB:
+                hash = await crowdContract.buyTokenByNative(pak.amount);
+                break;
+            case EToken.USDT:
+                const usdtContract = new UsdtContract(web3Provider);
+                await usdtContract.approve(
+                    crowdContract._contractAddress,
+                    pak.amount * rate.usdtRate
+                );
+                hash = await crowdContract.buyTokenByErc20(pak.amount);
+                break;
+            default:
+                console.error("Token not recognized");
+                break;
+        }
+        setTxHash(hash);
+        onOpen();
+        try {
+        } catch (err: any) {}
+        setPak(undefined);
+        setIsProcessing(false);
+    };
+    const getRate = React.useCallback(async () => {
+        const crowdContract = new CrowSaleContract();
+        const nativeRate = await crowdContract.getNativeRate();
+        const erc20Rate = await crowdContract.getPaymentRate();
+        setRate({ bnbRate: nativeRate, usdtRate: erc20Rate });
+    }, []);
+    React.useEffect(() => {
+        getRate();
+    }, [getRate]);
     return (
         <Flex
             w={{ base: "full", lg: "70%" }}
@@ -45,29 +93,37 @@ export default function InvestView() {
                     Blockchain Trainee
                 </Heading>
                 <Spacer />
-				{
-					!wallet ? (
-						<ConnectWallet onClick={onConnectMetamask} />
-					) : (
-						<WalletInfo
-							address={wallet?.address}
-							amount={wallet?.nativeAmt || 0}
-						/>
-					)
-				}
+                {!wallet ? (
+                    <ConnectWallet onClick={onConnectMetamask} />
+                ) : (
+                    <WalletInfo
+                        address={wallet?.address}
+                        amount={wallet?.nativeAmt || 0}
+                    />
+                )}
             </Flex>
-			<SimpleGrid columns={{base: 1, lg: 3}} mt="50px" spacingY="20px">
-				{packages.map((pk: IPackage, index) => 
-				<InvestCard 
-					pak={pk}
-					key={String(index)}
-					isBuying={isProcessing && pk?.key === pk.key}
-					rate={pk.token === EToken.BNB ? rate.bnbRate : rate.usdtRate}
-					walletInfo={wallet}
-					onBuy={()=>handleBuyIco(pk)}
-				/>
-				)}
-			</SimpleGrid>
+            <SimpleGrid columns={{ base: 1, lg: 3 }} mt="50px" spacingY="20px">
+                {packages.map((pk: IPackage, index) => (
+                    <InvestCard
+                        pak={pk}
+                        key={String(index)}
+                        isBuying={isProcessing && pak?.key === pk.key}
+                        rate={
+                            pk.token === EToken.BNB
+                                ? rate.bnbRate
+                                : rate.usdtRate
+                        }
+                        walletInfo={wallet}
+                        onBuy={() => handleBuyIco(pk)}
+                    />
+                ))}
+            </SimpleGrid>
+            <SuccessModal
+                isOpen={isOpen}
+                onClose={onClose}
+                hash={txHash}
+                title="Buy ICO"
+            />
         </Flex>
     );
 }
