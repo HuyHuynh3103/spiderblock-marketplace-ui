@@ -1,5 +1,5 @@
 import { Inter } from 'next/font/google'
-import InvestView from '@/src/views/invests'
+import InvestView from '@/views/invests'
 
 const inter = Inter({ subsets: ['latin'] })
 

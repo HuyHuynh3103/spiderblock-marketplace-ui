@@ -1,7 +1,7 @@
 import { Box, Image, Text, Button, HStack, Spinner } from "@chakra-ui/react";
 import React from "react";
-import { numberFormat } from "../../utils";
-import { IPackage, IWalletInfo } from "../../_types_";
+import { numberFormat } from "@/utils";
+import { IPackage, IWalletInfo } from "@/_types_";
 
 interface IProps {
     pak: IPackage;

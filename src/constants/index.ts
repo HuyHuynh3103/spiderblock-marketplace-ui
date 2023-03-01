@@ -1,4 +1,4 @@
-import { EToken, IPackage } from './../_types_/index';
+import { EToken, IMenu, IPackage } from '@/_types_';
 export const packages: IPackage[] = [
 	{
 		key: 'bnb-01',
@@ -40,4 +40,13 @@ export const packages: IPackage[] = [
 		icon: 'usdt.png',
 		token: EToken.USDT
 	},
+]
+
+export const menus: IMenu[] = [
+	{
+		name:'Invest', url: '/'
+	},
+	{
+		name: 'Market', url: '/market'
+	}
 ]

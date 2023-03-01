@@ -1,19 +1,13 @@
 declare var window: any;
-import { ConnectWallet, SuccessModal, WalletInfo } from "@/src/components";
-import { packages } from "@/src/constants";
-import CrowSaleContract from "@/src/contracts/CrowdSaleContract";
-import UsdtContract from "@/src/contracts/UsdtContract";
-import { EToken, IPackage, IRate, IWalletInfo } from "@/src/_types_";
-import {
-    Flex,
-    Heading,
-    SimpleGrid,
-    Spacer,
-    useDisclosure,
-} from "@chakra-ui/react";
+import { SuccessModal } from "@/components";
+import { packages } from "@/constants";
+import CrowSaleContract from "@/contracts/CrowdSaleContract";
+import UsdtContract from "@/contracts/UsdtContract";
+import { EToken, IPackage, IRate, IWalletInfo } from "@/_types_";
+import { SimpleGrid, useDisclosure } from "@chakra-ui/react";
 import { ethers } from "ethers";
 import React from "react";
-import { InvestCard } from "../components";
+import { InvestCard } from "./components";
 
 export default function InvestView() {
     const [wallet, setWallet] = React.useState<IWalletInfo>();
@@ -83,25 +77,7 @@ export default function InvestView() {
         getRate();
     }, [getRate]);
     return (
-        <Flex
-            w={{ base: "full", lg: "70%" }}
-            flexDirection="column"
-            margin="50px auto"
-        >
-            <Flex>
-                <Heading size="lg" fontWeight="bold">
-                    Blockchain Trainee
-                </Heading>
-                <Spacer />
-                {!wallet ? (
-                    <ConnectWallet onClick={onConnectMetamask} />
-                ) : (
-                    <WalletInfo
-                        address={wallet?.address}
-                        amount={wallet?.nativeAmt || 0}
-                    />
-                )}
-            </Flex>
+        <>
             <SimpleGrid columns={{ base: 1, lg: 3 }} mt="50px" spacingY="20px">
                 {packages.map((pk: IPackage, index) => (
                     <InvestCard
@@ -124,6 +100,6 @@ export default function InvestView() {
                 hash={txHash}
                 title="Buy ICO"
             />
-        </Flex>
+        </>
     );
 }
