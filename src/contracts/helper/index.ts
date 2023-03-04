@@ -1,4 +1,6 @@
 import ConversionHelper from "./conversion";
+import IpfsHelper from "./ipfs";
 export {
-	ConversionHelper
+	ConversionHelper, 
+	IpfsHelper
 }

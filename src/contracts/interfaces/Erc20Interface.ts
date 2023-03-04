@@ -1,36 +1,35 @@
 import { ethers } from "ethers";
 import { ConversionHelper } from "../helper";
-import BaseInterface from "./BaseInterface";
+import ErcStandardInterface from "./ErcStandardInterface";
 
-class Erc20 extends BaseInterface {
-
-	constructor(
-		provider: ethers.providers.Web3Provider | ethers.providers.JsonRpcProvider,
-		address: string, 
-		abi: ethers.ContractInterface
-	) {
-		super(provider, address, abi);
+class Erc20 extends ErcStandardInterface {
+    constructor(
+        provider:
+            | ethers.providers.Web3Provider
+            | ethers.providers.JsonRpcProvider,
+        address: string,
+        abi: ethers.ContractInterface
+    ) {
+        super(provider, address, abi);
+    }
+    async approve(_address: string, _amount: number): Promise<string> {
+        const wei = ConversionHelper._toWei(_amount);
+        const tx = await this._contract.approve(_address, wei, this._option);
+		return this._handleTransactionResponse(tx);
 	}
-	async balanceOf(walletAddress: string): Promise<number>{
-		const balance = await this._contract.balanceOf(walletAddress);
-		return ConversionHelper._toNumber(balance);
+    async transfer(_to: string, _amount: number): Promise<string> {
+        const wei = ConversionHelper._toWei(_amount);
+        const tx = await this._contract.tranfer(_to, wei, this._option);
+		return this._handleTransactionResponse(tx);
 	}
-	async owner(): Promise<string> {
-		return this._contract.owner();
-	}
-	async totalSuply(): Promise<number> {
-		const total = await this._contract.totalSupply();
-		return ConversionHelper._toNumber(total);
-	}
-	async name(): Promise<string> {
-		return this._contract.name();
-	}
-	async symbol(): Promise<string> {
-		return this._contract.symbol();
-	}
-	async approve(address: string, amount:number) {
-		const wei = ConversionHelper._toWei(amount);
-		await this._contract.approve(address, wei, this._option);
+    async transferFrom(
+        _from: string,
+        _to: string,
+        _amount: number
+    ): Promise<string> {
+        const wei = ConversionHelper._toWei(_amount);
+        const tx = await this._contract.transferFrom(_from, _to, wei, this._option);
+		return this._handleTransactionResponse(tx);
 	}
 }
 export default Erc20;

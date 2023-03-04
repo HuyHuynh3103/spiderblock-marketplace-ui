@@ -7,3 +7,5 @@ const getAddress = (address: AddressType) => {
 
 export const getCrowSaleAddress = () => getAddress(SMART_ADDRESS.CROWD_SALE);
 export const getUsdtAddress = () => getAddress(SMART_ADDRESS.USDT);
+export const getNftAddress = () => getAddress(SMART_ADDRESS.NFT);
+export const getMarketAddress = () => getAddress(SMART_ADDRESS.MARKET);

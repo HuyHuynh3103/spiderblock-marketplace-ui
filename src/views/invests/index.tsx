@@ -78,7 +78,7 @@ export default function InvestView() {
     }, [getRate]);
     return (
         <>
-            <SimpleGrid columns={{ base: 1, lg: 3 }} mt="50px" spacingY="20px">
+            <SimpleGrid columns={{ base: 1, lg: 3 }} mt="50px" spacing="10px">
                 {packages.map((pk: IPackage, index) => (
                     <InvestCard
                         pak={pk}

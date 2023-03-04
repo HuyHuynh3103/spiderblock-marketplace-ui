@@ -20,7 +20,6 @@ export default function InvestCard({
 }: IProps) {
     return (
         <Box
-            w={["100%", "100%", "380px"]}
             bg="bg.secondary"
             borderRadius="16px"
             overflow="hidden"
@@ -40,8 +39,6 @@ export default function InvestCard({
             />
 
             <Box
-                w={["80px", "80px", "120px"]}
-                h={["80px", "80px", "120px"]}
                 margin="0px auto"
                 borderRadius="full"
                 marginTop={["-40px", "-40px", "-60px"]}
