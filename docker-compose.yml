@@ -1,0 +1,13 @@
+services:
+ app:
+  build:
+   context: .
+  ports:
+    - 3000:3000
+  environment: 
+    - NEXT_PUBLIC_CHAIN_ID = 97
+    - NEXT_PUBLIC_RPC_MAINNET= https://bsc-dataseed1.binance.org/
+    - NEXT_PUBLIC_RPC_TESTNET= https://data-seed-prebsc-1-s2.binance.org:8545/
+  command: yarn dev
+  volumes:
+    - .:/app
