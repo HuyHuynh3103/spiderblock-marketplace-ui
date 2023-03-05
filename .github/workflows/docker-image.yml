@@ -29,6 +29,6 @@ jobs:
       uses: docker/build-push-action@v4
       with: 
        context: .
-       file: ./docker-compose.yml
+       file: ./Dockerfile
        push: true
-       tag: ${{secrets.DOCKERHUB_USERNAME}}/ico-dapp:latest
+       tags: ${{secrets.DOCKERHUB_USERNAME}}/ico-dapp:latest
