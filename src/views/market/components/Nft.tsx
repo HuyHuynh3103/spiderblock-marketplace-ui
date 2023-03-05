@@ -1,5 +1,13 @@
 import { ActionType, Clarity, INftItem } from "@/_types_";
-import { Flex, HStack, SimpleGrid, Button, Box, Image, Text } from "@chakra-ui/react";
+import {
+    Flex,
+    HStack,
+    SimpleGrid,
+    Button,
+    Box,
+    Image,
+    Text,
+} from "@chakra-ui/react";
 import React from "react";
 interface IProps {
     item: INftItem;
@@ -38,13 +46,13 @@ export default function Nft({
                 />
                 <Box position="absolute" top={5} right={10}>
                     <Text fontWeight="bold" fontSize="40px" fontStyle="italic">
-                        {/* {
+                        {
                             Clarity[
                                 item.attributes?.find(
                                     (p) => p.trait_type === "Rarity"
                                 )?.value || 0
                             ]
-                        } */}
+                        }
                     </Text>
                 </Box>
                 <HStack
@@ -53,7 +61,7 @@ export default function Nft({
                     top={5}
                     px="10px"
                 >
-                    <Text>ID: {item.id.toString().padStart(5, "0")}</Text>
+                    <Text>ID: #{item.id}</Text>
                 </HStack>
             </Box>
             <Text fontWeight="bold" py="10px">

@@ -1,11 +1,13 @@
-import getChainIdFromEnv, {AddressType, SMART_ADDRESS} from './common';
+import getChainIdFromEnv, { AddressType, SMART_ADDRESS } from "./common";
 
 const getAddress = (address: AddressType) => {
-	const CHAIN_ID = getChainIdFromEnv() as keyof AddressType;
-	return address[CHAIN_ID]
+    const CHAIN_ID = getChainIdFromEnv() as keyof AddressType;
+    return address[CHAIN_ID];
 };
 
 export const getCrowSaleAddress = () => getAddress(SMART_ADDRESS.CROWD_SALE);
 export const getUsdtAddress = () => getAddress(SMART_ADDRESS.USDT);
 export const getNftAddress = () => getAddress(SMART_ADDRESS.NFT);
 export const getMarketAddress = () => getAddress(SMART_ADDRESS.MARKET);
+export const getAuctionAddress = () => getAddress(SMART_ADDRESS.AUCTION);
+export const getFlopAddress = () => getAddress(SMART_ADDRESS.FLOP);

@@ -1,4 +1,4 @@
-import { getDesiredGateWay } from "./utils/common";
+import { getDesiredGateWay, getRPC } from "./utils/common";
 import { INftItem } from "./../_types_/index";
 import { getNftAbi } from "./utils/getAbis";
 import { getNftAddress } from "./utils/getAddress";
@@ -7,8 +7,12 @@ import { Erc721 } from "./interfaces";
 import { ConversionHelper, IpfsHelper } from "./helper";
 
 export default class NftContract extends Erc721 {
-    constructor(provider: ethers.providers.Web3Provider) {
-        super(provider, getNftAddress(), getNftAbi());
+    constructor(provider?: ethers.providers.Web3Provider) {
+		const rpcProvider = new ethers.providers.JsonRpcProvider(getRPC())
+        super(provider || rpcProvider, getNftAddress(), getNftAbi());
+		if(!provider) {
+			this._contract = new ethers.Contract(this._contractAddress, this._abis, rpcProvider);
+		}
     }
     private async _listTokenIds(walletAddr: string): Promise<number[]> {
         const idsBigNum: BigNumber[] = await this._contract.listTokenIds(
@@ -22,7 +26,7 @@ export default class NftContract extends Erc721 {
     private async _tokenURI(tokenId: number): Promise<string> {
         return await this._contract.tokenURI(tokenId);
     }
-    async getNftItemByTokenId(id: number): Promise<INftItem> {
+    async getNftItemByTokenId(id: number, others = {}): Promise<INftItem> {
         const tokenUrl = await this._tokenURI(id);
         const urlMetadata = IpfsHelper.parseToGateway(
             tokenUrl,
@@ -35,6 +39,7 @@ export default class NftContract extends Erc721 {
         );
         const item: INftItem = {
             ...metadata,
+			...others,
             id,
             image: imageUrl,
         };
@@ -51,7 +56,7 @@ export default class NftContract extends Erc721 {
     async getNftInfo(nfts: Array<any>): Promise<INftItem[]> {
         return Promise.all(
             nfts.map(async (nft: any) => {
-                return await this.getNftItemByTokenId(nft.tokenId);
+                return await this.getNftItemByTokenId(nft.tokenId, nft);
             })
         );
     }

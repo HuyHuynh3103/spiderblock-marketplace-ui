@@ -37,12 +37,12 @@ export interface INftItem {
 	image: string;
 	attributes?: IAttribute[],
 	// Listing 
-	priceListing?: number;
+	price?: number;
 	author?: string;
 	// Auction
 	owner?: string;
 	ownerImage?: string;
-	higestBid?: number
+	highestBid?: number
 }
 
 export enum Clarity {

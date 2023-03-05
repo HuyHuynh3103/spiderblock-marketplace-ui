@@ -48,5 +48,7 @@ export const menus: IMenu[] = [
 	},
 	{
 		name: 'Market', url: '/market'
+	},{
+		name: 'P2P', url: '/p2p'
 	}
 ]

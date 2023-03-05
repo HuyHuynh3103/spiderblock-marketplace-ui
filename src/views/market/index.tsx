@@ -17,6 +17,7 @@ import {
 import React from "react";
 import ListModal from "./components/ListModal";
 import Nft from "./components/Nft";
+import TransferModal from "./components/TransferModal";
 
 export default function MarketView() {
     const { web3Provider, wallet } = useAppSelector(
@@ -30,7 +31,8 @@ export default function MarketView() {
     const [isOpen, setIsOpen] = useBoolean();
     const [isUnList, setIsUnList] = useBoolean();
     const [txHash, setTxHash] = React.useState<string>();
-
+    const [isOpenTransferModal, setOpenTransferModal] = useBoolean();
+    const [isProcessing, setIsProcessing] = useBoolean();
     const {
         isOpen: isSuccess,
         onClose: onCloseSuccess,
@@ -45,7 +47,7 @@ export default function MarketView() {
         console.log(nfts);
         setNfts(nfts.filter((nft) => nft.name));
         const nftItems = await marketContract.getNFTListedOnMarketplace();
-		console.log(nftItems)
+        console.log(nftItems);
         const listedNfts = await nftContract.getNftInfo(nftItems);
         setNftsListed(listedNfts);
     }, [web3Provider, wallet]);
@@ -55,7 +57,14 @@ export default function MarketView() {
     }, [getListNft]);
 
     const selectAction = async (ac: ActionType, item: INftItem) => {
-        if ((ac !== "LIST" && ac !== "UNLIST") || !web3Provider) return;
+        if (
+            (ac !== "LIST" &&
+                ac !== "UNLIST" &&
+                ac !== "TRANSFER" &&
+                ac !== "AUCTION") ||
+            !web3Provider
+        )
+            return;
         setNftSelected(item);
         setAction(ac);
         setIsListing.off();
@@ -74,6 +83,11 @@ export default function MarketView() {
                 onOpenSuccess();
                 await getListNft();
                 break;
+            case "TRANSFER":
+                setOpenTransferModal.on();
+                break;
+            case "AUCTION":
+                break;
             default:
                 break;
         }
@@ -88,17 +102,37 @@ export default function MarketView() {
                 marketContract._contractAddress,
                 nftSelected.id
             );
-			console.log()
+            console.log();
             const tx = await marketContract.listNft(nftSelected.id, price);
             setTxHash(tx);
             onOpenSuccess();
             setAction(undefined);
             setNftSelected(undefined);
-            setIsOpen.off();
+            setOpenTransferModal.off();
             await getListNft();
         } catch (er: any) {
             console.error(er);
         }
+    };
+    const handleTransfer = async (addressTo: string) => {
+        setIsProcessing.on();
+        try {
+            if (!web3Provider || !nftSelected || !wallet) return;
+            const nftContract = new NftContract(web3Provider);
+            const tx = await nftContract.safeTransferFrom(
+                wallet.address,
+                addressTo,
+                nftSelected.id
+            );
+            console.log("tx");
+            setTxHash(tx);
+            setOpenTransferModal.off();
+            onOpenSuccess();
+            await getListNft();
+        } catch (error) {
+			console.error(error)
+		}
+        setIsProcessing.off();
     };
     return (
         <Flex w="full">
@@ -201,7 +235,7 @@ export default function MarketView() {
 
             <ProcessingModal isOpen={isUnList} onClose={() => {}} />
             <ListModal
-				type="LISTING"
+                type="LISTING"
                 isOpen={isOpen}
                 nft={nftSelected}
                 isListing={isListing}
@@ -209,13 +243,13 @@ export default function MarketView() {
                 onList={(amount) => handleListNft(amount)}
             />
 
-            {/* <TransferModal
-        isOpen={isOpenTransferModal}
-        nft={nft}
-        isTransfer={isProcessing}
-        onClose={() => setOpenTransferModal(false)}
-        onTransfer={(toAddress) => handleTransfer(toAddress)}
-      /> */}
+            <TransferModal
+                isOpen={isOpenTransferModal}
+                nft={nftSelected}
+                isTransfer={isProcessing}
+                onClose={() => setOpenTransferModal.off()}
+                onTransfer={(toAddress) => handleTransfer(toAddress)}
+            />
 
             <SuccessModal
                 hash={txHash}
