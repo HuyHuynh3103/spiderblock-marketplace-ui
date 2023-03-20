@@ -4,7 +4,7 @@ import ErcStandardInterface from "./ErcStandardInterface";
 
 class Erc721 extends ErcStandardInterface {
 	constructor(
-		provider: ethers.providers.Web3Provider | ethers.providers.JsonRpcProvider,
+		provider: ethers.providers.Provider | ethers.Signer,
 		address: string, 
 		abi: ethers.ContractInterface
 	) {

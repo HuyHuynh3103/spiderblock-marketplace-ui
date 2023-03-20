@@ -1,27 +1,24 @@
-import { TransactionResponse } from "@ethersproject/abstract-provider";
 import { ethers, Overrides } from "ethers";
 
 export default class BaseInterface {
-    _provider: ethers.providers.Web3Provider | ethers.providers.JsonRpcProvider;
+    _provider: ethers.providers.Provider | ethers.Signer;
     _contractAddress: string;
     _abis: ethers.ContractInterface;
     _contract: ethers.Contract;
     _option: Overrides;
 
     constructor(
-        provider:
-            | ethers.providers.Web3Provider
-            | ethers.providers.JsonRpcProvider,
+        provider: ethers.providers.Provider | ethers.Signer,
         address: string,
         abi: ethers.ContractInterface
     ) {
         this._provider = provider, 
 		this._contractAddress = address;
         this._abis = abi;
-        this._contract = new ethers.Contract(address, abi, provider.getSigner());
+        this._contract = new ethers.Contract(address, abi, provider);
         this._option = { gasLimit: 300000 };
     }
-    _handleTransactionResponse = async (tx: TransactionResponse) => {
+    _handleTransactionResponse = async (tx: any) => {
         try {
             const receipt = await tx.wait();
             return receipt.transactionHash;

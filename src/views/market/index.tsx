@@ -1,7 +1,7 @@
 import { ProcessingModal, SuccessModal } from "@/components";
 import MarketContract from "@/contracts/MarketContract";
 import NftContract from "@/contracts/NftContract";
-import { useAppSelector } from "@/reduxs/hooks";
+import getChainIdFromEnv from "@/contracts/utils/common";
 import { ActionType, INftItem } from "@/_types_";
 import {
     Flex,
@@ -15,14 +15,14 @@ import {
     useDisclosure,
 } from "@chakra-ui/react";
 import React from "react";
+import { useAccount, useSigner } from "wagmi";
 import ListModal from "./components/ListModal";
 import Nft from "./components/Nft";
 import TransferModal from "./components/TransferModal";
 
 export default function MarketView() {
-    const { web3Provider, wallet } = useAppSelector(
-        (state: any) => state.account
-    );
+    const { data: signer } = useSigner({ chainId: getChainIdFromEnv() });
+    const { address } = useAccount();
     const [nfts, setNfts] = React.useState<INftItem[]>([]);
     const [nftsListed, setNftsListed] = React.useState<INftItem[]>([]);
     const [nftSelected, setNftSelected] = React.useState<INftItem>();
@@ -39,18 +39,18 @@ export default function MarketView() {
         onOpen: onOpenSuccess,
     } = useDisclosure();
     const getListNft = React.useCallback(async () => {
-        if (!web3Provider || !wallet) return;
+        if (!address) return;
         console.log("getlist");
-        const nftContract = new NftContract(web3Provider);
-        const marketContract = new MarketContract(web3Provider);
-        const nfts = await nftContract.getListNfts(wallet.address);
+        const nftContract = new NftContract();
+        const marketContract = new MarketContract();
+        const nfts = await nftContract.getListNfts(address);
         console.log(nfts);
         setNfts(nfts.filter((nft) => nft.name));
         const nftItems = await marketContract.getNFTListedOnMarketplace();
         console.log(nftItems);
         const listedNfts = await nftContract.getNftInfo(nftItems);
         setNftsListed(listedNfts);
-    }, [web3Provider, wallet]);
+    }, [address]);
 
     React.useEffect(() => {
         getListNft();
@@ -62,7 +62,7 @@ export default function MarketView() {
                 ac !== "UNLIST" &&
                 ac !== "TRANSFER" &&
                 ac !== "AUCTION") ||
-            !web3Provider
+            !signer
         )
             return;
         setNftSelected(item);
@@ -74,7 +74,7 @@ export default function MarketView() {
                 break;
             case "UNLIST":
                 setIsUnList.on();
-                const marketContract = new MarketContract(web3Provider);
+                const marketContract = new MarketContract(signer);
                 const tx = await marketContract.unListNft(item.id);
                 setTxHash(tx);
                 setAction(undefined);
@@ -93,11 +93,11 @@ export default function MarketView() {
         }
     };
     const handleListNft = async (price?: number) => {
-        if (!price || !web3Provider || !wallet || !nftSelected) return;
+        if (!price || !signer || !address || !nftSelected) return;
         setIsListing.on();
         try {
-            const nftContract = new NftContract(web3Provider);
-            const marketContract = new MarketContract(web3Provider);
+            const nftContract = new NftContract(signer);
+            const marketContract = new MarketContract(signer);
             await nftContract.approve(
                 marketContract._contractAddress,
                 nftSelected.id
@@ -117,10 +117,10 @@ export default function MarketView() {
     const handleTransfer = async (addressTo: string) => {
         setIsProcessing.on();
         try {
-            if (!web3Provider || !nftSelected || !wallet) return;
-            const nftContract = new NftContract(web3Provider);
+            if (!signer || !nftSelected || !address) return;
+            const nftContract = new NftContract(signer);
             const tx = await nftContract.safeTransferFrom(
-                wallet.address,
+                address,
                 addressTo,
                 nftSelected.id
             );

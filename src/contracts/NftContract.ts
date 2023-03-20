@@ -7,7 +7,7 @@ import { Erc721 } from "./interfaces";
 import { ConversionHelper, IpfsHelper } from "./helper";
 
 export default class NftContract extends Erc721 {
-    constructor(provider?: ethers.providers.Web3Provider) {
+    constructor(provider?: ethers.providers.Provider | ethers.Signer) {
 		const rpcProvider = new ethers.providers.JsonRpcProvider(getRPC())
         super(provider || rpcProvider, getNftAddress(), getNftAbi());
 		if(!provider) {

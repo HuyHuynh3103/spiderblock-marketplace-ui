@@ -4,7 +4,7 @@ import BaseInterface from "./BaseInterface";
 
 class ErcStandardInterface extends BaseInterface {
 	constructor(
-		provider: ethers.providers.Web3Provider | ethers.providers.JsonRpcProvider,
+		provider: ethers.providers.Provider | ethers.Signer,
 		address: string, 
 		abi: ethers.ContractInterface
 	) {

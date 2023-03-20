@@ -6,7 +6,7 @@ import { BaseInterface } from "./interfaces";
 import { ConversionHelper } from "./helper";
 
 export default class MarketContract extends BaseInterface {
-    constructor(provider?: ethers.providers.Web3Provider) {
+    constructor(provider?: ethers.providers.Provider | ethers.Signer) {
 		const rpcProvider = new ethers.providers.JsonRpcProvider(getRPC())
         super(provider || rpcProvider, getMarketAddress(), getMarketAbi());
 		if(!provider) {

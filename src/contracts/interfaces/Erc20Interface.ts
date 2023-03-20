@@ -4,9 +4,7 @@ import ErcStandardInterface from "./ErcStandardInterface";
 
 class Erc20 extends ErcStandardInterface {
     constructor(
-        provider:
-            | ethers.providers.Web3Provider
-            | ethers.providers.JsonRpcProvider,
+        provider: ethers.providers.Provider | ethers.Signer,
         address: string,
         abi: ethers.ContractInterface
     ) {
@@ -15,21 +13,26 @@ class Erc20 extends ErcStandardInterface {
     async approve(_address: string, _amount: number): Promise<string> {
         const wei = ConversionHelper._toWei(_amount);
         const tx = await this._contract.approve(_address, wei, this._option);
-		return this._handleTransactionResponse(tx);
-	}
+        return this._handleTransactionResponse(tx);
+    }
     async transfer(_to: string, _amount: number): Promise<string> {
         const wei = ConversionHelper._toWei(_amount);
         const tx = await this._contract.tranfer(_to, wei, this._option);
-		return this._handleTransactionResponse(tx);
-	}
+        return this._handleTransactionResponse(tx);
+    }
     async transferFrom(
         _from: string,
         _to: string,
         _amount: number
     ): Promise<string> {
         const wei = ConversionHelper._toWei(_amount);
-        const tx = await this._contract.transferFrom(_from, _to, wei, this._option);
-		return this._handleTransactionResponse(tx);
-	}
+        const tx = await this._contract.transferFrom(
+            _from,
+            _to,
+            wei,
+            this._option
+        );
+        return this._handleTransactionResponse(tx);
+    }
 }
 export default Erc20;

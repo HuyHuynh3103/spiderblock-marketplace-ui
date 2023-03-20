@@ -6,7 +6,7 @@ import { Erc20 } from "./interfaces";
 import { ConversionHelper } from './helper';
 
 export default class UsdtContract extends Erc20 {
-    constructor(provider?: ethers.providers.Web3Provider) {
+    constructor(provider?: ethers.providers.Provider | ethers.Signer) {
 		const rpcProvider = new ethers.providers.JsonRpcProvider(getRPC())
         super(provider || rpcProvider, getUsdtAddress(), getUsdtAbi());
 		if(!provider) {

@@ -2,21 +2,25 @@ import { SuccessModal } from "@/components";
 import FlopContract from "@/contracts/FlopContract";
 import MarketContract from "@/contracts/MarketContract";
 import NftContract from "@/contracts/NftContract";
-import { useAppSelector } from "@/reduxs/hooks";
+import getChainIdFromEnv from "@/contracts/utils/common";
 import { getToast } from "@/utils";
 import { INftItem } from "@/_types_";
 import { SimpleGrid, useDisclosure, useToast } from "@chakra-ui/react";
 import React from "react";
+import { useAccount, useSigner } from "wagmi";
 import NftP2P from "./components/NftP2P";
 
 export default function P2PView() {
-    const { web3Provider, wallet } = useAppSelector((state) => state.account);
+    const { data: signer } = useSigner({ chainId: getChainIdFromEnv() });
+    
+    const { address } = useAccount();
     const toast = useToast();
     const [currentNft, setCurrentNft] = React.useState<INftItem>();
     const [txHash, setTxHash] = React.useState<string>();
     const { isOpen, onClose, onOpen } = useDisclosure();
     const [nfts, setNfts] = React.useState<INftItem[]>([]);
     const getListedNfts = React.useCallback(async () => {
+       
         try {
             const marketContract = new MarketContract();
             const nftContract = new NftContract();
@@ -28,11 +32,11 @@ export default function P2PView() {
         }
     }, []);
     const handleBuy = React.useCallback(async (nft: INftItem) => {
-        if (!web3Provider || !nft.price) return;
+        if (!signer || !nft.price) return;
         try {
             setCurrentNft(nft);
-            const marketContract = new MarketContract(web3Provider);
-            const iptContract = new FlopContract(web3Provider);
+            const marketContract = new MarketContract(signer);
+            const iptContract = new FlopContract(signer);
             await iptContract.approve(
                 marketContract._contractAddress,
                 nft.price
@@ -56,7 +60,7 @@ export default function P2PView() {
                     <NftP2P
                         item={nft}
                         key={nft.id}
-                        isDisabled={!wallet}
+                        isDisabled={!address}
                         isBuying={currentNft?.id === nft.id}
                         onAction={() => handleBuy(nft)}
                     />

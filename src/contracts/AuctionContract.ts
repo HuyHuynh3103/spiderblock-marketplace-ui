@@ -6,7 +6,7 @@ import { ConversionHelper } from "./helper";
 import { getRPC } from "./utils/common";
 
 export default class AuctionContract extends BaseInterface {
-    constructor(provider?: ethers.providers.Web3Provider) {
+    constructor(provider?: ethers.providers.Provider | ethers.Signer) {
         const rpcProvider = new ethers.providers.JsonRpcProvider(getRPC());
         super(provider || rpcProvider, getAuctionAddress(), getAuctionAbi());
         if (!provider) {

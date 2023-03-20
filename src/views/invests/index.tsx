@@ -1,55 +1,36 @@
-declare var window: any;
 import { SuccessModal } from "@/components";
 import { packages } from "@/constants";
 import CrowSaleContract from "@/contracts/CrowdSaleContract";
 import UsdtContract from "@/contracts/UsdtContract";
+import getChainIdFromEnv from "@/contracts/utils/common";
 import { EToken, IPackage, IRate, IWalletInfo } from "@/_types_";
 import { SimpleGrid, useDisclosure } from "@chakra-ui/react";
-import { ethers } from "ethers";
 import React from "react";
+import { useAccount, useBalance, useSigner } from "wagmi";
 import { InvestCard } from "./components";
 
 export default function InvestView() {
     const [wallet, setWallet] = React.useState<IWalletInfo>();
+    const { data: signer } = useSigner({ chainId: getChainIdFromEnv() });
+    const { address } = useAccount();
+    const { data: balanceData } = useBalance();
     const [isProcessing, setIsProcessing] = React.useState<boolean>(false);
     const [pak, setPak] = React.useState<IPackage>();
     const [rate, setRate] = React.useState<IRate>({ bnbRate: 0, usdtRate: 0 });
     const [txHash, setTxHash] = React.useState<string>();
     const { isOpen, onOpen, onClose } = useDisclosure();
-    const [web3Provider, setWeb3Provider] =
-        React.useState<ethers.providers.Web3Provider>();
-    const onConnectMetamask = async () => {
-        if (window.ethereum) {
-            const provider = new ethers.providers.Web3Provider(
-                window.ethereum,
-                undefined
-            );
-            await provider.send("eth_requestAccounts", []);
-            const signer = await provider.getSigner();
-            const address = await signer.getAddress();
-            const bigBalance = await signer.getBalance();
-            const nativeBalance = Number.parseFloat(
-                ethers.utils.formatEther(bigBalance)
-            );
-            setWeb3Provider(provider);
-            setWallet({
-                address,
-                nativeAmt: nativeBalance,
-            });
-        }
-    };
     const handleBuyIco = async (pak: IPackage) => {
-        if (!web3Provider) return;
+        if (!signer) return;
         setPak(pak);
         setIsProcessing(true);
         let hash = "";
-        const crowdContract = new CrowSaleContract(web3Provider);
+        const crowdContract = new CrowSaleContract(signer);
         switch (pak.token) {
             case EToken.BNB:
                 hash = await crowdContract.buyTokenByNative(pak.amount);
                 break;
             case EToken.USDT:
-                const usdtContract = new UsdtContract(web3Provider);
+                const usdtContract = new UsdtContract(signer);
                 await usdtContract.approve(
                     crowdContract._contractAddress,
                     pak.amount * rate.usdtRate
@@ -76,6 +57,14 @@ export default function InvestView() {
     React.useEffect(() => {
         getRate();
     }, [getRate]);
+    React.useEffect(() => {
+        if (address && balanceData) {
+            setWallet({
+                address,
+                nativeAmt: balanceData?.decimals ,
+            });
+        }
+    }, [balanceData, address]);
     return (
         <>
             <SimpleGrid columns={{ base: 1, lg: 3 }} mt="50px" spacing="10px">

@@ -4,10 +4,9 @@ import { ethers } from "ethers";
 import { BaseInterface } from "./interfaces";
 import { getRPC } from "./utils/common";
 import { ConversionHelper } from "./helper";
-import { TransactionResponse } from "@ethersproject/abstract-provider";
 
 export default class CrowSaleContract extends BaseInterface {
-    constructor(provider?: ethers.providers.Web3Provider) {
+    constructor(provider?: ethers.providers.Provider | ethers.Signer) {
         const rpcProvider = new ethers.providers.JsonRpcProvider(getRPC());
         super(provider || rpcProvider, getCrowSaleAddress(), getCrowSaleAbi());
         if (!provider) {
@@ -31,7 +30,7 @@ export default class CrowSaleContract extends BaseInterface {
     async buyTokenByNative(amount: number) {
         const rate = await this.getNativeRate();
 		console.log('Provider', this._provider)
-        const tx: TransactionResponse = await this._contract.buyByNative({
+        const tx = await this._contract.buyByNative({
             ...this._option,
             value: ConversionHelper._numberToEth(amount * rate),
         });
@@ -39,7 +38,7 @@ export default class CrowSaleContract extends BaseInterface {
     }
     async buyTokenByErc20(amount: number) {
         const rate = await this.getPaymentRate();
-        const tx: TransactionResponse = await this._contract.buyByToken(
+        const tx = await this._contract.buyByToken(
             ConversionHelper._numberToEth(amount * rate)
         );
         return this._handleTransactionResponse(tx);
