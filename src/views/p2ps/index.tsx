@@ -5,14 +5,18 @@ import NftContract from "@/contracts/NftContract";
 import getChainIdFromEnv from "@/contracts/utils/common";
 import { getToast } from "@/utils";
 import { INftItem } from "@/_types_";
-import { SimpleGrid, useDisclosure, useToast } from "@chakra-ui/react";
+import {
+    SimpleGrid,
+    useDisclosure,
+    useToast,
+} from "@chakra-ui/react";
 import React from "react";
 import { useAccount, useSigner } from "wagmi";
 import NftP2P from "./components/NftP2P";
 
 export default function P2PView() {
     const { data: signer } = useSigner({ chainId: getChainIdFromEnv() });
-    
+
     const { address } = useAccount();
     const toast = useToast();
     const [currentNft, setCurrentNft] = React.useState<INftItem>();
@@ -20,7 +24,6 @@ export default function P2PView() {
     const { isOpen, onClose, onOpen } = useDisclosure();
     const [nfts, setNfts] = React.useState<INftItem[]>([]);
     const getListedNfts = React.useCallback(async () => {
-       
         try {
             const marketContract = new MarketContract();
             const nftContract = new NftContract();
@@ -55,11 +58,10 @@ export default function P2PView() {
 
     return (
         <>
-            <SimpleGrid column={4} spacing="20px">
+            <SimpleGrid minChildWidth="120px" spacing="40px">
                 {nfts.map((nft) => (
                     <NftP2P
                         item={nft}
-                        key={nft.id}
                         isDisabled={!address}
                         isBuying={currentNft?.id === nft.id}
                         onAction={() => handleBuy(nft)}

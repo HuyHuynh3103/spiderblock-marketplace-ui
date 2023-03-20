@@ -38,5 +38,6 @@ export const getToast = (
         position: "top-right",
         description: msg,
         duration: 3000,
+		isClosable: true
     };
 };

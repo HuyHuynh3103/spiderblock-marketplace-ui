@@ -2,6 +2,7 @@ import { ProcessingModal, SuccessModal } from "@/components";
 import MarketContract from "@/contracts/MarketContract";
 import NftContract from "@/contracts/NftContract";
 import getChainIdFromEnv from "@/contracts/utils/common";
+import { getToast } from "@/utils";
 import { ActionType, INftItem } from "@/_types_";
 import {
     Flex,
@@ -13,6 +14,7 @@ import {
     Tabs,
     useBoolean,
     useDisclosure,
+    useToast,
 } from "@chakra-ui/react";
 import React from "react";
 import { useAccount, useSigner } from "wagmi";
@@ -21,12 +23,12 @@ import Nft from "./components/Nft";
 import TransferModal from "./components/TransferModal";
 
 export default function MarketView() {
+    const toast = useToast();
     const { data: signer } = useSigner({ chainId: getChainIdFromEnv() });
     const { address } = useAccount();
     const [nfts, setNfts] = React.useState<INftItem[]>([]);
     const [nftsListed, setNftsListed] = React.useState<INftItem[]>([]);
     const [nftSelected, setNftSelected] = React.useState<INftItem>();
-    const [action, setAction] = React.useState<ActionType>();
     const [isListing, setIsListing] = useBoolean();
     const [isOpen, setIsOpen] = useBoolean();
     const [isUnList, setIsUnList] = useBoolean();
@@ -39,17 +41,19 @@ export default function MarketView() {
         onOpen: onOpenSuccess,
     } = useDisclosure();
     const getListNft = React.useCallback(async () => {
-        if (!address) return;
-        console.log("getlist");
-        const nftContract = new NftContract();
-        const marketContract = new MarketContract();
-        const nfts = await nftContract.getListNfts(address);
-        console.log(nfts);
-        setNfts(nfts.filter((nft) => nft.name));
-        const nftItems = await marketContract.getNFTListedOnMarketplace();
-        console.log(nftItems);
-        const listedNfts = await nftContract.getNftInfo(nftItems);
-        setNftsListed(listedNfts);
+        if (address) {
+            console.log("getlist");
+            const nftContract = new NftContract();
+            const marketContract = new MarketContract();
+            const nfts = await nftContract.getListNfts(address);
+            setNfts(nfts.filter((nft) => nft.name));
+            const nftItems = await marketContract.getNFTListedOnMarketplace();
+            const listedNfts = await nftContract.getNftInfo(nftItems);
+            setNftsListed(listedNfts);
+        } else {
+			setNfts([]);
+			setNftsListed([]);
+		}
     }, [address]);
 
     React.useEffect(() => {
@@ -57,16 +61,8 @@ export default function MarketView() {
     }, [getListNft]);
 
     const selectAction = async (ac: ActionType, item: INftItem) => {
-        if (
-            (ac !== "LIST" &&
-                ac !== "UNLIST" &&
-                ac !== "TRANSFER" &&
-                ac !== "AUCTION") ||
-            !signer
-        )
-            return;
+        if (!signer) return;
         setNftSelected(item);
-        setAction(ac);
         setIsListing.off();
         switch (ac) {
             case "LIST":
@@ -74,14 +70,7 @@ export default function MarketView() {
                 break;
             case "UNLIST":
                 setIsUnList.on();
-                const marketContract = new MarketContract(signer);
-                const tx = await marketContract.unListNft(item.id);
-                setTxHash(tx);
-                setAction(undefined);
-                setNftSelected(undefined);
-                setIsUnList.off();
-                onOpenSuccess();
-                await getListNft();
+                handleUnList(item);
                 break;
             case "TRANSFER":
                 setOpenTransferModal.on();
@@ -93,7 +82,11 @@ export default function MarketView() {
         }
     };
     const handleListNft = async (price?: number) => {
-        if (!price || !signer || !address || !nftSelected) return;
+        if (!signer) {
+            toast(getToast("Please connect wallet first", "info", "Info"));
+            return;
+        }
+        if (!price || !address || !nftSelected) return;
         setIsListing.on();
         try {
             const nftContract = new NftContract(signer);
@@ -102,22 +95,27 @@ export default function MarketView() {
                 marketContract._contractAddress,
                 nftSelected.id
             );
-            console.log();
             const tx = await marketContract.listNft(nftSelected.id, price);
             setTxHash(tx);
             onOpenSuccess();
-            setAction(undefined);
             setNftSelected(undefined);
+            setIsListing.off();
             setOpenTransferModal.off();
             await getListNft();
         } catch (er: any) {
             console.error(er);
+            setIsListing.off();
+            toast(getToast(er));
         }
     };
     const handleTransfer = async (addressTo: string) => {
         setIsProcessing.on();
         try {
-            if (!signer || !nftSelected || !address) return;
+            if (!signer) {
+                toast(getToast("Please connect wallet first", "info", "Info"));
+                return;
+            }
+            if (!nftSelected || !address) return;
             const nftContract = new NftContract(signer);
             const tx = await nftContract.safeTransferFrom(
                 address,
@@ -127,12 +125,33 @@ export default function MarketView() {
             console.log("tx");
             setTxHash(tx);
             setOpenTransferModal.off();
+            setIsProcessing.off();
             onOpenSuccess();
             await getListNft();
-        } catch (error) {
-			console.error(error)
-		}
-        setIsProcessing.off();
+        } catch (error: any) {
+            console.error(error);
+            setIsProcessing.off();
+            toast(getToast(error));
+        }
+    };
+    const handleUnList = async (item: INftItem) => {
+        if (!signer) {
+            toast(getToast("Please connect wallet first", "info", "Info"));
+            return;
+        }
+        if (!nftSelected) return;
+        try {
+            const marketContract = new MarketContract(signer);
+            const tx = await marketContract.unListNft(item.id);
+            setTxHash(tx);
+            setNftSelected(undefined);
+            setIsUnList.off();
+            onOpenSuccess();
+            await getListNft();
+        } catch (error: any) {
+            console.error(error);
+            toast(getToast(error));
+        }
     };
     return (
         <Flex w="full">

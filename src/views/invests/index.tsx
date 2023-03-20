@@ -3,13 +3,15 @@ import { packages } from "@/constants";
 import CrowSaleContract from "@/contracts/CrowdSaleContract";
 import UsdtContract from "@/contracts/UsdtContract";
 import getChainIdFromEnv from "@/contracts/utils/common";
+import { getToast } from "@/utils";
 import { EToken, IPackage, IRate, IWalletInfo } from "@/_types_";
-import { SimpleGrid, useDisclosure } from "@chakra-ui/react";
+import { SimpleGrid, useDisclosure, useToast } from "@chakra-ui/react";
 import React from "react";
 import { useAccount, useBalance, useSigner } from "wagmi";
 import { InvestCard } from "./components";
 
 export default function InvestView() {
+    const toast = useToast();
     const [wallet, setWallet] = React.useState<IWalletInfo>();
     const { data: signer } = useSigner({ chainId: getChainIdFromEnv() });
     const { address } = useAccount();
@@ -20,33 +22,40 @@ export default function InvestView() {
     const [txHash, setTxHash] = React.useState<string>();
     const { isOpen, onOpen, onClose } = useDisclosure();
     const handleBuyIco = async (pak: IPackage) => {
-        if (!signer) return;
-        setPak(pak);
-        setIsProcessing(true);
-        let hash = "";
-        const crowdContract = new CrowSaleContract(signer);
-        switch (pak.token) {
-            case EToken.BNB:
-                hash = await crowdContract.buyTokenByNative(pak.amount);
-                break;
-            case EToken.USDT:
-                const usdtContract = new UsdtContract(signer);
-                await usdtContract.approve(
-                    crowdContract._contractAddress,
-                    pak.amount * rate.usdtRate
-                );
-                hash = await crowdContract.buyTokenByErc20(pak.amount);
-                break;
-            default:
-                console.error("Token not recognized");
-                break;
-        }
-        setTxHash(hash);
-        onOpen();
+        if (!signer) {
+			toast(getToast("Please connect wallet first", "info", "Info"));
+			return;
+		}
         try {
-        } catch (err: any) {}
-        setPak(undefined);
-        setIsProcessing(false);
+            setPak(pak);
+            setIsProcessing(true);
+            let hash = "";
+            const crowdContract = new CrowSaleContract(signer);
+            switch (pak.token) {
+                case EToken.BNB:
+                    hash = await crowdContract.buyTokenByNative(pak.amount);
+                    break;
+                case EToken.USDT:
+                    const usdtContract = new UsdtContract(signer);
+                    await usdtContract.approve(
+                        crowdContract._contractAddress,
+                        pak.amount * rate.usdtRate
+                    );
+                    hash = await crowdContract.buyTokenByErc20(pak.amount);
+                    break;
+                default:
+                    console.error("Token not recognized");
+                    break;
+            }
+            setTxHash(hash);
+            onOpen();
+            setPak(undefined);
+            setIsProcessing(false);
+        } catch (err: any) {
+            toast(getToast(err))
+            setPak(undefined);
+            setIsProcessing(false);
+        }
     };
     const getRate = React.useCallback(async () => {
         const crowdContract = new CrowSaleContract();
@@ -61,7 +70,7 @@ export default function InvestView() {
         if (address && balanceData) {
             setWallet({
                 address,
-                nativeAmt: balanceData?.decimals ,
+                nativeAmt: balanceData?.decimals,
             });
         }
     }, [balanceData, address]);
