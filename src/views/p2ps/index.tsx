@@ -61,6 +61,7 @@ export default function P2PView() {
             <SimpleGrid minChildWidth="120px" spacing="40px">
                 {nfts.map((nft) => (
                     <NftP2P
+						key={nft.id}
                         item={nft}
                         isDisabled={!address}
                         isBuying={currentNft?.id === nft.id}

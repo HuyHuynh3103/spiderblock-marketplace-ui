@@ -1,38 +1,41 @@
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+## Spider Block
+Hello, and welcome to my decentralize application! My name is Huy, and I am the author of this Dapp built with NextJs, wagmi, and ethers. The smart contract is currently deployed on the BSC testnet only.
 
-## Getting Started
+## Installation
 
-First, run the development server:
+To run this project, please follow these steps:
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-```
+1. Copy `env.example` to `.env`
+2. Install dependencies: 
+   ```bash
+   yarn install
+   ```
+3. Run the project:
+   ```bash
+   yarn dev
+   ```
+4. Open the project in your browser:
+   ```bash
+   http://localhost:3000
+   ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Usage
 
-You can start editing the page by modifying `pages/index.tsx`. The page auto-updates as you edit the file.
+Once you have successfully installed the project, you can now use it. Please follow the instructions below:
 
-[API routes](https://nextjs.org/docs/api-routes/introduction) can be accessed on [http://localhost:3000/api/hello](http://localhost:3000/api/hello). This endpoint can be edited in `pages/api/hello.ts`.
+1. Connect your wallet
+2. Faucet USDT Testnet to your wallet
+3. Buy LPT token though ICO crowdsale
+4. Go to P2P page and order a NFT
+5. After buying the NFT, you can go to the Market page to see your NFT
+6. At the Market page, you can also sell, transfer or auction your NFT
 
-The `pages/api` directory is mapped to `/api/*`. Files in this directory are treated as [API routes](https://nextjs.org/docs/api-routes/introduction) instead of React pages.
+## Contributing
 
-This project uses [`next/font`](https://nextjs.org/docs/basic-features/font-optimization) to automatically optimize and load Inter, a custom Google Font.
+If you are interested in contributing to this project, please feel free to submit a pull request. All contributions are welcome!
 
-## Learn More
+## License
 
-To learn more about Next.js, take a look at the following resources:
+This project is licensed under the MIT License - see the `LICENSE` file for details.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
+Thank you for your interest in my project, and happy coding!
