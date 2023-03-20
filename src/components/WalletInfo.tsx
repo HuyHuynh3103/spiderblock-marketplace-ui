@@ -1,4 +1,4 @@
-import { Button, HStack, Image, Text } from "@chakra-ui/react";
+import { Button, HStack, Image, SimpleGrid, Text } from "@chakra-ui/react";
 import React from "react";
 import { useAccount, useBalance, useDisconnect } from "wagmi";
 import { numberFormat, showSortAddress } from "../utils";
@@ -15,22 +15,25 @@ export default function WalletInfo() {
     const { data } = useBalance({ address });
     const { disconnect } = useDisconnect();
     return (
-        <Popover>
+        <Popover placement="bottom-end">
             <PopoverTrigger>
-                <Button variant="outline" ml="10px">
+                <Button variant="outline">
                     <HStack>
                         <Text>{showSortAddress(address)}</Text>
-                        <Image src="/bnb.png" w="25px" alt="bnb" ml="202px" />
-                        <Text>{numberFormat(data?.formatted ?? "0")}</Text>
+                        <Image
+                            src="/bnb.png"
+                            w={{ base: "20px", lg: "25px" }}
+                            alt="bnb"
+                        />
                     </HStack>
                 </Button>
             </PopoverTrigger>
             <PopoverContent>
                 <PopoverArrow />
                 <PopoverBody>
-                    Balance: {data?.formatted} {data?.symbol}
+                    Balance: {numberFormat(data?.formatted ?? 0)} {data?.symbol}
                 </PopoverBody>
-                <PopoverFooter justifyItems='flex-end'>
+                <PopoverFooter>
                     <Button onClick={() => disconnect()}>Disconnect</Button>
                 </PopoverFooter>
             </PopoverContent>

@@ -1,15 +1,17 @@
 import { ConnectWallet, WalletInfo } from "@/components";
 import { menus } from "@/constants";
+import { HamburgerIcon } from "@chakra-ui/icons";
 import {
+	Button,
     Flex,
     Heading,
+    Menu,
+    MenuButton,
+    MenuItem,
+    MenuList,
+    SimpleGrid,
     Spacer,
-    Tab,
-    TabList,
-    Tabs,
-    Text,
 } from "@chakra-ui/react";
-import Link from "next/link";
 import { useRouter } from "next/router";
 import React, { ReactNode } from "react";
 import { useAccount } from "wagmi";
@@ -36,28 +38,34 @@ export default function MainLayout({ children }: IProps) {
             flexDirection="column"
             margin="50px auto"
         >
-            <Flex>
-                <Heading size="lg" fontWeight="bold">
+            <Flex gap="10px" margin="auto 20px">
+                <Heading
+                    fontWeight="bold"
+                    fontSize={{ base: "20px", lg: "30px" }}
+                >
                     Blockchain Trainee
                 </Heading>
                 <Spacer />
-
-                {menus.map((menu) => (
-                    <Link href={menu.url} key={menu.url}>
-                        <Text
-                            mx="20px"
-                            fontSize="20px"
-							borderBottom={currentMenu.url === menu.url ? "3px solid rgba(254,223,86,.6)" : "none"}
-							color={currentMenu.url === menu.url ? "white" : "gray.500"}
-                        >
-                            {menu.name}
-                        </Text>
-                    </Link>
-                ))}
-
-                {!isConnected ? <ConnectWallet /> : <WalletInfo />}
+                <SimpleGrid columns={{ base: 1, md: 2 }} gap={5}>
+                    <Menu>
+                        <MenuButton
+							as={Button}
+							rightIcon={<HamburgerIcon />}
+						>
+							{currentMenu.name}
+						</MenuButton>
+                        <MenuList>
+                            {menus.map((menu, index) => (
+                                <MenuItem as="a" href={menu.url} key={index}>
+                                    {menu.name}
+                                </MenuItem>
+                            ))}
+                        </MenuList>
+                    </Menu>
+                    {!isConnected ? <ConnectWallet /> : <WalletInfo />}
+                </SimpleGrid>
             </Flex>
-            <Flex w="full" flexDirection="column" py="50px">
+            <Flex flexDirection="column" m="10px">
                 {children}
             </Flex>
         </Flex>

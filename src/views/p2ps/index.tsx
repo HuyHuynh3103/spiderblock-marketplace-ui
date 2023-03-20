@@ -5,11 +5,7 @@ import NftContract from "@/contracts/NftContract";
 import getChainIdFromEnv from "@/contracts/utils/common";
 import { getToast } from "@/utils";
 import { INftItem } from "@/_types_";
-import {
-    SimpleGrid,
-    useDisclosure,
-    useToast,
-} from "@chakra-ui/react";
+import { SimpleGrid, useDisclosure, useToast } from "@chakra-ui/react";
 import React from "react";
 import { useAccount, useSigner } from "wagmi";
 import NftP2P from "./components/NftP2P";
@@ -58,10 +54,14 @@ export default function P2PView() {
 
     return (
         <>
-            <SimpleGrid minChildWidth="120px" spacing="40px">
+            <SimpleGrid
+                w="full"
+                columns={{ base: 1, md: 2, lg: 3 }}
+                spacing={10}
+            >
                 {nfts.map((nft) => (
                     <NftP2P
-						key={nft.id}
+                        key={nft.id}
                         item={nft}
                         isDisabled={!address}
                         isBuying={currentNft?.id === nft.id}
