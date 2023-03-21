@@ -35,8 +35,8 @@ export default function P2PView() {
         try {
             setCurrentNft(nft);
             const marketContract = new MarketContract(signer);
-            const iptContract = new FlopContract(signer);
-            await iptContract.approve(
+            const flopContract = new FlopContract(signer);
+            await flopContract.approve(
                 marketContract._contractAddress,
                 nft.price
             );

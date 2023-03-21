@@ -74,7 +74,7 @@ export default function ListModal({
                                     right="40px"
                                     color="rgba(255,255,255, 0.4)"
                                 >
-                                    IPT
+                                    FLOP
                                 </Text>
                             </Flex>
 
