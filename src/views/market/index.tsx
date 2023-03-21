@@ -1,9 +1,10 @@
 import { ProcessingModal, SuccessModal } from "@/components";
+import AuctionContract from "@/contracts/AuctionContract";
 import MarketContract from "@/contracts/MarketContract";
 import NftContract from "@/contracts/NftContract";
 import getChainIdFromEnv from "@/contracts/utils/common";
 import { getToast } from "@/utils";
-import { ActionType, INftItem } from "@/_types_";
+import { ActionType, IAuctionInfo, INftItem } from "@/_types_";
 import {
     Flex,
     SimpleGrid,
@@ -18,6 +19,8 @@ import {
 } from "@chakra-ui/react";
 import React from "react";
 import { useAccount, useSigner } from "wagmi";
+import NftAuction from "../auctions/components/NftAuction";
+import AuctionModal from "./components/AuctionModal";
 import ListModal from "./components/ListModal";
 import Nft from "./components/Nft";
 import TransferModal from "./components/TransferModal";
@@ -29,12 +32,13 @@ export default function MarketView() {
     const [nfts, setNfts] = React.useState<INftItem[]>([]);
     const [nftsListed, setNftsListed] = React.useState<INftItem[]>([]);
     const [nftSelected, setNftSelected] = React.useState<INftItem>();
-    const [isListing, setIsListing] = useBoolean();
-    const [isOpen, setIsOpen] = useBoolean();
+    const [auctions, setAuctions] = React.useState<IAuctionInfo[]>([]);
+    const [isOpenListing, setIsOpenListing] = useBoolean();
     const [isUnList, setIsUnList] = useBoolean();
     const [txHash, setTxHash] = React.useState<string>();
     const [isOpenTransferModal, setOpenTransferModal] = useBoolean();
     const [isProcessing, setIsProcessing] = useBoolean();
+    const [isOpenAuction, setIsOpenAuction] = useBoolean();
     const {
         isOpen: isSuccess,
         onClose: onCloseSuccess,
@@ -50,10 +54,20 @@ export default function MarketView() {
             const nftItems = await marketContract.getNFTListedOnMarketplace();
             const listedNfts = await nftContract.getNftInfo(nftItems);
             setNftsListed(listedNfts);
+
+            const auctionContract = new AuctionContract();
+            const auctionNfts = await auctionContract.getAuctionActive();
+            console.log(auctionNfts);
+            const myAuctions = auctionNfts.filter(
+                (p) => p.auctioneer === address
+            );
+            const nftAuctions = await nftContract.getNftAuctionInfo(myAuctions);
+            setAuctions(nftAuctions);
         } else {
-			setNfts([]);
-			setNftsListed([]);
-		}
+            setNfts([]);
+            setNftsListed([]);
+            setAuctions([]);
+        }
     }, [address]);
 
     React.useEffect(() => {
@@ -63,10 +77,10 @@ export default function MarketView() {
     const selectAction = async (ac: ActionType, item: INftItem) => {
         if (!signer) return;
         setNftSelected(item);
-        setIsListing.off();
+        setIsProcessing.off();
         switch (ac) {
             case "LIST":
-                setIsOpen.on();
+                setIsOpenListing.on();
                 break;
             case "UNLIST":
                 setIsUnList.on();
@@ -75,8 +89,10 @@ export default function MarketView() {
             case "TRANSFER":
                 setOpenTransferModal.on();
                 break;
-            case "AUCTION":
+            case "AUCTION": {
+                setIsOpenAuction.on();
                 break;
+            }
             default:
                 break;
         }
@@ -87,7 +103,7 @@ export default function MarketView() {
             return;
         }
         if (!price || !address || !nftSelected) return;
-        setIsListing.on();
+        setIsProcessing.on();
         try {
             const nftContract = new NftContract(signer);
             const marketContract = new MarketContract(signer);
@@ -99,12 +115,12 @@ export default function MarketView() {
             setTxHash(tx);
             onOpenSuccess();
             setNftSelected(undefined);
-            setIsListing.off();
+            setIsProcessing.off();
             setOpenTransferModal.off();
             await getListNft();
         } catch (er: any) {
             console.error(er);
-            setIsListing.off();
+            setIsProcessing.off();
             toast(getToast(er));
         }
     };
@@ -153,6 +169,56 @@ export default function MarketView() {
             toast(getToast(error));
         }
     };
+    const handleCancelAuction = async (item: IAuctionInfo) => {
+        if (!signer) {
+            toast(getToast("Please connect wallet first", "info", "Info"));
+            return;
+        }
+        try {
+            const auctionContract = new AuctionContract(signer);
+            const tx = await auctionContract.cancelAuction(item.id);
+            setTxHash(tx);
+            onOpenSuccess();
+            await getListNft();
+        } catch (error: any) {
+            console.error(error);
+            toast(getToast(error));
+        }
+    };
+    const handleCreateAuction = async (price: number, endTime: Date) => {
+        if (!signer) {
+            toast(getToast("Please connect wallet first", "info", "Info"));
+            return;
+        }
+        if (!nftSelected) return;
+        try {
+            const nftContract = new NftContract(signer);
+            const auctionContract = new AuctionContract(signer);
+            await nftContract.approve(
+                auctionContract._contractAddress,
+                nftSelected.id
+            );
+            const startTimestamp = Math.floor(Date.now());
+            const endTimestamp = endTime.getTime();
+            const tx = await auctionContract.createAuction(
+                nftSelected.id,
+                price,
+                startTimestamp,
+                endTimestamp
+            );
+            setTxHash(tx);
+            onOpenSuccess();
+            setNftSelected(undefined);
+            setIsProcessing.off();
+            setOpenTransferModal.off();
+            await getListNft();
+        } catch (er: any) {
+            console.error(er);
+            setIsProcessing.off();
+            toast(getToast(er));
+        }
+    };
+
     return (
         <Flex w="full">
             <Tabs>
@@ -194,7 +260,11 @@ export default function MarketView() {
                 </TabList>
                 <TabPanels>
                     <TabPanel>
-                        <SimpleGrid w="full" columns={{ base: 1, md: 2, lg: 3 }} spacing={10}>
+                        <SimpleGrid
+                            w="full"
+                            columns={{ base: 1, md: 2, lg: 3 }}
+                            spacing={10}
+                        >
                             {nfts.map((nft, index) => (
                                 <Nft
                                     item={nft}
@@ -210,7 +280,11 @@ export default function MarketView() {
                     </TabPanel>
 
                     <TabPanel>
-                        <SimpleGrid w="full" columns={{ base: 1, md: 2, lg: 3 }} spacing={10}>
+                        <SimpleGrid
+                            w="full"
+                            columns={{ base: 1, md: 2, lg: 3 }}
+                            spacing={10}
+                        >
                             {nftsListed.map((nft, index) => (
                                 <Nft
                                     item={nft}
@@ -224,29 +298,19 @@ export default function MarketView() {
                     </TabPanel>
 
                     <TabPanel>
-                        <SimpleGrid w="full" columns={4} spacing={10}>
-                            {/* {auctions.map((nft, index) => (
-                <NftAuction
-                  item={nft}
-                  key={index}
-                  isCancel
-                  onAction={async (a) => {
-                    setIsUnList.on();
-                    try {
-                      const auctionContract = new AuctionContract(web3Provider);
-                      const tx = await auctionContract.cancelAuction(
-                        nft.auctionId
-                      );
-                      setTxHash(tx);
-                      onOpenSuccess();
-                      await getListNft();
-                    } catch (ex) {
-                      console.log(ex);
-                    }
-                    setIsUnList.off();
-                  }}
-                />
-              ))} */}
+                        <SimpleGrid
+                            w="full"
+                            columns={{ base: 1, md: 2, lg: 3 }}
+                            spacing={10}
+                        >
+                            {auctions.map((nft, index) => (
+                                <NftAuction
+                                    item={nft}
+                                    key={index}
+                                    isCancel
+                                    onAction={() => handleCancelAuction(nft)}
+                                />
+                            ))}
                         </SimpleGrid>
                     </TabPanel>
                 </TabPanels>
@@ -254,12 +318,22 @@ export default function MarketView() {
 
             <ProcessingModal isOpen={isUnList} onClose={() => {}} />
             <ListModal
-                type="LISTING"
-                isOpen={isOpen}
+                isOpen={isOpenListing}
                 nft={nftSelected}
-                isListing={isListing}
-                onClose={() => setIsOpen.off()}
+                isListing={isProcessing}
+                onClose={() => setIsOpenListing.off()}
                 onList={(amount) => handleListNft(amount)}
+            />
+            <AuctionModal
+                isOpen={isOpenAuction}
+                nft={nftSelected}
+                isProcessing={isProcessing}
+                onClose={() => setIsOpenAuction.off()}
+                onAuction={(price, endTime) => {
+                    if (price && endTime) {
+                        handleCreateAuction(price, endTime);
+                    }
+                }}
             />
 
             <TransferModal

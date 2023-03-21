@@ -14,18 +14,18 @@ import {
 } from "@chakra-ui/react";
 import { INftItem } from "@/_types_";
 import React from "react";
-
-
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
 interface IProps extends Omit<ModalProps, "children"> {
     nft?: INftItem;
-    isListing?: boolean;
-    onList?: (amount?: number) => void;
+    isProcessing?: boolean;
+    onAuction?: (amount?: number, expireDate?: Date | null) => void;
 }
 
-export default function ListModal({
+export default function AuctionModal({
     nft,
-    isListing,
-    onList,
+    isProcessing,
+    onAuction,
     ...props
 }: IProps) {
     const [amount, setAmount] = React.useState<number>();
@@ -50,7 +50,7 @@ export default function ListModal({
                             mb="20px"
                         />
                         <Flex w="full" direction="column">
-                            <Text fontWeight="bold">Price listing:</Text>
+                            <Text fontWeight="bold">Reserve price</Text>
                             <Text
                                 fontSize="12px"
                                 fontStyle="italic"
@@ -78,12 +78,35 @@ export default function ListModal({
                                 </Text>
                             </Flex>
 
+                            <Text fontWeight="bold" mb="10px">
+                                Expiration date:
+                            </Text>
+                            <Flex
+                                border="0.2px solid rgba(255,255,255,0.2)"
+                                px="10px"
+                                py="10px"
+                                borderRadius="6px"
+                                mb="10px"
+                            >
+                                <DatePicker
+                                    selected={startDate}
+                                    onChange={(date) => setStartDate(date)}
+                                    locale="pt-BR"
+                                    showTimeSelect
+                                    timeFormat="p"
+                                    timeIntervals={15}
+                                    dateFormat="Pp"
+                                    className="bg-transparent"
+                                />
+                            </Flex>
                             <Button
                                 variant="primary"
-                                onClick={() => onList && onList(amount)}
-                                disabled={!amount || isListing}
+                                onClick={() =>
+                                    onAuction && onAuction(amount, startDate)
+                                }
+                                disabled={!amount || isProcessing}
                             >
-                                {isListing ? <Spinner /> : "List Now"}
+                                {isProcessing ? <Spinner /> : "Auction Now"}
                             </Button>
                         </Flex>
                     </Flex>
