@@ -210,7 +210,7 @@ export default function MarketView() {
                     </TabPanel>
 
                     <TabPanel>
-                        <SimpleGrid w="full" columns={4} spacing={10}>
+                        <SimpleGrid w="full" columns={{ base: 1, md: 2, lg: 3 }} spacing={10}>
                             {nftsListed.map((nft, index) => (
                                 <Nft
                                     item={nft}
