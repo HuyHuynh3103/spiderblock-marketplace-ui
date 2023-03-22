@@ -18,14 +18,6 @@ export default class CrowSaleContract extends BaseInterface {
             );
         }
     }
-    async getNativeRate(): Promise<number> {
-        let rate = await this._contract.getNativeRate();
-        return ConversionHelper._toNumber(rate);
-    }
-    async getPaymentRate(): Promise<number> {
-        let rate = await this._contract.getTokenRate();
-        return ConversionHelper._toNumber(rate);
-    }
     async buyTokenByNative(nativeAmount: number): Promise<string> {
         const tx = await this._contract.buyByNative({
             ...this._option,
@@ -47,7 +39,8 @@ export default class CrowSaleContract extends BaseInterface {
             tokenAddress = await this._contract.payment_token();
         }
         const result: { success: boolean; value: BigNumber } =
-		await this._contract.getNeededAmount(tokenAddress, icoAmount);
+		await this._contract.getNeededAmount(tokenAddress, ConversionHelper._numberToEth(icoAmount));
+		console.log('r', result.value.toString(), result.success)
         return ConversionHelper._toEther(result.value);
     }
 }

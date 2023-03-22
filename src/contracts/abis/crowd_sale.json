@@ -41,6 +41,19 @@
         "inputs": [
             {
                 "indexed": false,
+                "internalType": "contract IERC20Upgradeable",
+                "name": "_newToken",
+                "type": "address"
+            }
+        ],
+        "name": "ICOTokenChanged",
+        "type": "event"
+    },
+    {
+        "anonymous": false,
+        "inputs": [
+            {
+                "indexed": false,
                 "internalType": "uint8",
                 "name": "version",
                 "type": "uint8"
@@ -249,19 +262,6 @@
         "type": "function"
     },
     {
-        "inputs": [],
-        "name": "getNativeRate",
-        "outputs": [
-            {
-                "internalType": "uint256",
-                "name": "",
-                "type": "uint256"
-            }
-        ],
-        "stateMutability": "view",
-        "type": "function"
-    },
-    {
         "inputs": [
             {
                 "internalType": "address",
@@ -304,19 +304,6 @@
                 "internalType": "bytes32",
                 "name": "",
                 "type": "bytes32"
-            }
-        ],
-        "stateMutability": "view",
-        "type": "function"
-    },
-    {
-        "inputs": [],
-        "name": "getTokenRate",
-        "outputs": [
-            {
-                "internalType": "uint256",
-                "name": "",
-                "type": "uint256"
             }
         ],
         "stateMutability": "view",
@@ -501,6 +488,19 @@
             }
         ],
         "name": "revokeRole",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "contract IERC20Upgradeable",
+                "name": "_newToken",
+                "type": "address"
+            }
+        ],
+        "name": "setIcoToken",
         "outputs": [],
         "stateMutability": "nonpayable",
         "type": "function"
