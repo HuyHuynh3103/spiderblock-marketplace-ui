@@ -14,8 +14,6 @@ import {
 } from "@chakra-ui/react";
 import { INftItem } from "@/_types_";
 import React from "react";
-import DatePicker from "react-datepicker";
-import "react-datepicker/dist/react-datepicker.css";
 interface IProps extends Omit<ModalProps, "children"> {
     nft?: INftItem;
     isProcessing?: boolean;
@@ -60,6 +58,9 @@ export default function AuctionModal({
                             </Text>
                             <Flex w="full" my="10px">
                                 <Input
+                                    placeholder="Input initial price"
+                                    borderRadius="6px"
+                                    min="0"
                                     w="full"
                                     value={amount}
                                     onChange={(e) =>
@@ -69,7 +70,7 @@ export default function AuctionModal({
                                 />
                                 <Text
                                     fontWeight="bold"
-                                    fontSize="24px"
+                                    fontSize="20px"
                                     position="absolute"
                                     right="40px"
                                     color="rgba(255,255,255, 0.4)"
@@ -81,32 +82,27 @@ export default function AuctionModal({
                             <Text fontWeight="bold" mb="10px">
                                 Expiration date:
                             </Text>
-                            <Flex
-                                border="0.2px solid rgba(255,255,255,0.2)"
-                                px="10px"
-                                py="10px"
-                                borderRadius="6px"
+                            <Input
+                                onChange={(e) =>
+                                    setStartDate(new Date(e.target.value))
+                                }
+                                placeholder="Select Date and Time"
+                                size="md"
+                                min={new Date().toISOString().split("T")[0]}
+                                type="datetime-local"
                                 mb="10px"
-                            >
-                                <DatePicker
-                                    selected={startDate}
-                                    onChange={(date) => setStartDate(date)}
-                                    locale="pt-BR"
-                                    showTimeSelect
-                                    timeFormat="p"
-                                    timeIntervals={15}
-                                    dateFormat="Pp"
-                                    className="bg-transparent"
-                                />
-                            </Flex>
+                                border-radius="6px"
+                            />
                             <Button
                                 variant="primary"
                                 onClick={() =>
                                     onAuction && onAuction(amount, startDate)
                                 }
-                                disabled={!amount || isProcessing}
+                                isDisabled={!amount || isProcessing}
+								isLoading={isProcessing}
+								loadingText="Auctioning..."
                             >
-                                {isProcessing ? <Spinner /> : "Auction Now"}
+                                Auction now
                             </Button>
                         </Flex>
                     </Flex>

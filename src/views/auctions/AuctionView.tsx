@@ -9,13 +9,12 @@ import { SuccessModal } from "@/components";
 import { useAccount, useSigner } from "wagmi";
 import { getToast } from "@/utils";
 import getChainIdFromEnv from "@/contracts/utils/common";
-import FlopContract from "@/contracts/FlopContract";
+import SpiderBlockTokenContract from "@/contracts/SpiderBlockTokenContract";
 import Empty from "@/components/Empty";
 
 export default function AuctionView() {
     const toast = useToast();
     const { data: signer } = useSigner({ chainId: getChainIdFromEnv() });
-    const { address } = useAccount();
     const [nfts, setNfts] = React.useState<IAuctionInfo[]>([]);
     const [nftSelected, setNftSelected] = React.useState<IAuctionInfo>();
     const [isOpen, setIsOpen] = useBoolean();
@@ -23,9 +22,18 @@ export default function AuctionView() {
 
     const [isProcessing, setIsProcessing] = useBoolean();
     const [txHash, setTxHash] = React.useState<string>();
-
+	const [symbol, setSymbol] = React.useState<string>("");
+    const getSymbol = React.useCallback(async () => {
+        const spiderBlockContract = new SpiderBlockTokenContract();
+        const symbol = await spiderBlockContract.symbol();
+        setSymbol(symbol);
+    }, []);
+    React.useEffect(() => {
+        getSymbol();
+    }, [getSymbol]);
+	
     const getListAuctions = React.useCallback(async () => {
-        const auctionContract = new AuctionContract();
+		const auctionContract = new AuctionContract();
         const nfts = await auctionContract.getAuctionActive();
         const nftContract = new NftContract();
         const auctionItems = await nftContract.getNftAuctionInfo(nfts);
@@ -45,8 +53,8 @@ export default function AuctionView() {
         setIsProcessing.on();
         try {
             const auctionContract = new AuctionContract(signer);
-            const flopContract = new FlopContract(signer);
-            await flopContract.approve(auctionContract._contractAddress, bid);
+            const spiderBlockContract = new SpiderBlockTokenContract(signer);
+            await spiderBlockContract.approve(auctionContract._contractAddress, bid);
             const tx = await auctionContract.joinAuction(
                 nftSelected.auctionId,
                 bid
@@ -63,7 +71,7 @@ export default function AuctionView() {
     };
 
     return (
-        <Flex w="full" p={{lg: "30px 20px"}}>
+        <Flex w="full" p={{ lg: "30px 20px" }}>
             {nfts.length === 0 ? (
                 <Empty text="There are no auction openning now" />
             ) : (
@@ -82,6 +90,7 @@ export default function AuctionView() {
             )}
 
             <AuctionModal
+				symbol={symbol}
                 isOpen={isOpen}
                 isProcessing={isProcessing}
                 nft={nftSelected}

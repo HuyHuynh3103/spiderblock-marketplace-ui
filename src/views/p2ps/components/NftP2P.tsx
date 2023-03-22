@@ -15,6 +15,7 @@ import {
 import React from "react";
 interface IProps {
     item: INftItem;
+	symbol: string;
     isBuying?: boolean;
     isDisabled?: boolean;
     onAction?: () => void;
@@ -22,6 +23,7 @@ interface IProps {
 
 export default function NftP2P({
     item,
+	symbol,
     isBuying,
     isDisabled,
     onAction,
@@ -79,7 +81,7 @@ export default function NftP2P({
                     </Text>
                     <Spacer />
                     <Text color="#fedf56" fontWeight="bold">
-                        {numberFormat(item.price || 0)} FLOP
+                        {numberFormat(item.price || 0)} {symbol}
                     </Text>
                 </HStack>
             </VStack>

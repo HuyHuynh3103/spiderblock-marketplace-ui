@@ -3,10 +3,6 @@ export interface IWalletInfo {
     nativeAmt: number;
 }
 
-export interface IRate {
-    usdtRate: number;
-    bnbRate: number;
-}
 export enum EToken {
     BNB = "BNB",
     USDT = "USDT",

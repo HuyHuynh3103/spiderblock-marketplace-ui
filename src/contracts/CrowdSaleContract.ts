@@ -1,6 +1,7 @@
+import { EToken } from "@/_types_";
 import { getCrowSaleAbi } from "./utils/getAbis";
 import { getCrowSaleAddress } from "./utils/getAddress";
-import { ethers } from "ethers";
+import { BigNumber, ethers } from "ethers";
 import { BaseInterface } from "./interfaces";
 import { getRPC } from "./utils/common";
 import { ConversionHelper } from "./helper";
@@ -18,29 +19,35 @@ export default class CrowSaleContract extends BaseInterface {
         }
     }
     async getNativeRate(): Promise<number> {
-        let rate = await this._contract.native_rate();
-		let percentage = await this._contract.PERCENTAGE_FRACTION();
-        return ConversionHelper._toNumber(rate) / ConversionHelper._toNumber(percentage);
+        let rate = await this._contract.getNativeRate();
+        return ConversionHelper._toNumber(rate);
     }
     async getPaymentRate(): Promise<number> {
-        let rate = await this._contract.token_rate();
-		let percentage = await this._contract.PERCENTAGE_FRACTION();
-        return ConversionHelper._toNumber(rate) / ConversionHelper._toNumber(percentage);
+        let rate = await this._contract.getTokenRate();
+        return ConversionHelper._toNumber(rate);
     }
-    async buyTokenByNative(amount: number) {
-        const rate = await this.getNativeRate();
-		console.log('Provider', this._provider)
+    async buyTokenByNative(nativeAmount: number): Promise<string> {
         const tx = await this._contract.buyByNative({
             ...this._option,
-            value: ConversionHelper._numberToEth(amount * rate),
+            value: ConversionHelper._numberToEth(nativeAmount),
         });
         return this._handleTransactionResponse(tx);
     }
-    async buyTokenByErc20(amount: number) {
-        const rate = await this.getPaymentRate();
+    async buyTokenByErc20(paymentTokenAmount: number): Promise<string> {
         const tx = await this._contract.buyByToken(
-            ConversionHelper._numberToEth(amount * rate)
+            ConversionHelper._numberToEth(paymentTokenAmount)
         );
         return this._handleTransactionResponse(tx);
+    }
+    async getNeededAmount(icoAmount: number, token: EToken): Promise<number> {
+        let tokenAddress: String;
+        if (token == EToken.BNB) {
+            tokenAddress = ethers.constants.AddressZero;
+        } else {
+            tokenAddress = await this._contract.payment_token();
+        }
+        const result: { success: boolean; value: BigNumber } =
+		await this._contract.getNeededAmount(tokenAddress, icoAmount);
+        return ConversionHelper._toEther(result.value);
     }
 }

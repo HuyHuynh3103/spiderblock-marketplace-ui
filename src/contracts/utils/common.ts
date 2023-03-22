@@ -29,7 +29,7 @@ export const getDesiredGateWay = () => {
 
 export const SMART_ADDRESS = {
     CROWD_SALE: {
-        97: "0xE2140f676F67Dd35a23183B8F85dBF3536C9848C",
+        97: "0x5144DcC0eE9863afCC65D75578b8F424Faf46A53",
         56: "",
     },
     USDT: {
@@ -48,8 +48,8 @@ export const SMART_ADDRESS = {
         97: "0x7FDC4475c948eE3Ba33fE0b5f7FF8e4e63EBea63",
         56: "",
     },
-    FLOP: {
-        97: "0x91e1272Adb3804745aA35619843349573A49ECe7",
+    SPIDERBLOCK: {
+        97: "0x2a47d693800350301ad76a736519d776E306f1d3",
         56: "",
     },
 	FAUCET: {

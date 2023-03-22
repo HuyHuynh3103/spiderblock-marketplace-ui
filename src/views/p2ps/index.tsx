@@ -1,6 +1,6 @@
 import { SuccessModal } from "@/components";
 import Empty from "@/components/Empty";
-import FlopContract from "@/contracts/FlopContract";
+import SpiderBlockTokenContract from "@/contracts/SpiderBlockTokenContract";
 import MarketContract from "@/contracts/MarketContract";
 import NftContract from "@/contracts/NftContract";
 import getChainIdFromEnv from "@/contracts/utils/common";
@@ -20,6 +20,15 @@ export default function P2PView() {
     const [txHash, setTxHash] = React.useState<string>();
     const { isOpen, onClose, onOpen } = useDisclosure();
     const [nfts, setNfts] = React.useState<INftItem[]>([]);
+	const [symbol, setSymbol] = React.useState<string>("");
+    const getSymbol = React.useCallback(async () => {
+        const spiderBlockContract = new SpiderBlockTokenContract();
+        const symbol = await spiderBlockContract.symbol();
+        setSymbol(symbol);
+    }, []);
+    React.useEffect(() => {
+        getSymbol();
+    }, [getSymbol]);
     const getListedNfts = React.useCallback(async () => {
         try {
             const marketContract = new MarketContract();
@@ -37,8 +46,8 @@ export default function P2PView() {
         try {
             setCurrentNft(nft);
             const marketContract = new MarketContract(signer);
-            const flopContract = new FlopContract(signer);
-            await flopContract.approve(
+            const spiderBlockContract = new SpiderBlockTokenContract(signer);
+            await spiderBlockContract.approve(
                 marketContract._contractAddress,
                 nft.price
             );
@@ -55,7 +64,7 @@ export default function P2PView() {
     }, [getListedNfts]);
 
     return (
-        <Flex w="full" p={{lg: "30px 20px"}}>
+        <Flex w="full" p={{ lg: "30px 20px" }}>
             {nfts.length === 0 ? (
                 <Empty text="There are no nfts in marketplace" />
             ) : (
@@ -66,6 +75,7 @@ export default function P2PView() {
                 >
                     {nfts.map((nft) => (
                         <NftP2P
+							symbol={symbol}
                             key={nft.id}
                             item={nft}
                             isDisabled={!address}

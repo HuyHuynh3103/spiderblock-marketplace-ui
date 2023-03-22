@@ -3,6 +3,7 @@ import Empty from "@/components/Empty";
 import AuctionContract from "@/contracts/AuctionContract";
 import MarketContract from "@/contracts/MarketContract";
 import NftContract from "@/contracts/NftContract";
+import SpiderBlockTokenContract from "@/contracts/SpiderBlockTokenContract";
 import getChainIdFromEnv from "@/contracts/utils/common";
 import { getToast } from "@/utils";
 import { ActionType, IAuctionInfo, INftItem } from "@/_types_";
@@ -40,6 +41,15 @@ export default function CollectionView() {
     const [isOpenTransferModal, setOpenTransferModal] = useBoolean();
     const [isProcessing, setIsProcessing] = useBoolean();
     const [isOpenAuction, setIsOpenAuction] = useBoolean();
+	const [symbol, setSymbol] = React.useState<string>("");
+    const getSymbol = React.useCallback(async () => {
+        const spiderBlockContract = new SpiderBlockTokenContract();
+        const symbol = await spiderBlockContract.symbol();
+        setSymbol(symbol);
+    }, []);
+    React.useEffect(() => {
+        getSymbol();
+    }, [getSymbol]);
     const {
         isOpen: isSuccess,
         onClose: onCloseSuccess,
@@ -195,6 +205,7 @@ export default function CollectionView() {
             return;
         }
         if (!nftSelected) return;
+		setIsProcessing.on();
         try {
             const nftContract = new NftContract(signer);
             const auctionContract = new AuctionContract(signer);
@@ -332,6 +343,7 @@ export default function CollectionView() {
 
             <ProcessingModal isOpen={isUnList} onClose={() => {}} />
             <ListModal
+				symbol={symbol}
                 isOpen={isOpenListing}
                 nft={nftSelected}
                 isListing={isProcessing}

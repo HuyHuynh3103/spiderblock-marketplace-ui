@@ -3,7 +3,7 @@ export const packages: IPackage[] = [
     {
         key: "bnb-01",
         name: "bnb package 01",
-        amount: 1000,
+        amount: 100,
         bg: "bnb-bg.jpeg",
         icon: "bnb.png",
         token: EToken.BNB,
@@ -11,7 +11,7 @@ export const packages: IPackage[] = [
     {
         key: "bnb-02",
         name: "bnb package 02",
-        amount: 2000,
+        amount: 200,
         bg: "bnb-bg.jpeg",
         icon: "bnb.png",
         token: EToken.BNB,
@@ -19,7 +19,7 @@ export const packages: IPackage[] = [
     {
         key: "usdt-01",
         name: "usdt package 01",
-        amount: 1000,
+        amount: 100,
         bg: "usdt-bg.png",
         icon: "usdt.png",
         token: EToken.USDT,
@@ -27,7 +27,7 @@ export const packages: IPackage[] = [
     {
         key: "usdt-02",
         name: "usdt package 02",
-        amount: 2000,
+        amount: 200,
         bg: "usdt-bg.png",
         icon: "usdt.png",
         token: EToken.USDT,
@@ -35,7 +35,7 @@ export const packages: IPackage[] = [
     {
         key: "usdt-03",
         name: "usdt package 03",
-        amount: 3000,
+        amount: 300,
         bg: "usdt-bg.png",
         icon: "usdt.png",
         token: EToken.USDT,

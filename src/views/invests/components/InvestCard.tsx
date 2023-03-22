@@ -2,22 +2,36 @@ import { Box, Image, Text, Button, HStack, Spinner } from "@chakra-ui/react";
 import React from "react";
 import { numberFormat } from "@/utils";
 import { IPackage, IWalletInfo } from "@/_types_";
+import CrowSaleContract from "@/contracts/CrowdSaleContract";
 
 interface IProps {
     pak: IPackage;
     isBuying: boolean;
-    rate: number;
     walletInfo?: IWalletInfo;
-    onBuy?: () => void;
+	symbol: string;
+    onBuy: (paymentAmount: number) => void;
 }
 
 export default function InvestCard({
     pak,
     isBuying,
-    rate,
     walletInfo,
+	symbol,
     onBuy,
 }: IProps) {
+    const [paymentAmount, setPaymentAmount] = React.useState<number>(0);
+    const getNeedAmount = React.useCallback(async () => {
+		const crowdContract = new CrowSaleContract();
+        const amount = await crowdContract.getNeededAmount(
+			pak.amount,
+            pak.token
+			);
+        setPaymentAmount(amount);
+    }, [pak.token]);
+    React.useEffect(() => {
+		getNeedAmount();
+    }, [getNeedAmount]);
+	
     return (
         <Box
             bg="bg.secondary"
@@ -78,12 +92,12 @@ export default function InvestCard({
                 border="1px solid #fff"
                 color="rgba(255,255,255, 0.7)"
             >
-                {numberFormat(pak.amount)} FLOP
+                {numberFormat(pak.amount)} {symbol}
             </Button>
             <HStack my="15px">
                 <Text color="gray">Amount of coins to pay: </Text>
                 <Text variant="notoSan" fontSize={["14px", "14px", "16px"]}>
-                    {numberFormat(pak.amount * rate)} {pak.token}
+                    {numberFormat(paymentAmount)} {pak.token}
                 </Text>
             </HStack>
 
@@ -91,7 +105,7 @@ export default function InvestCard({
                 w="full"
                 variant="primary"
                 disabled={!walletInfo?.address || isBuying}
-                onClick={onBuy}
+                onClick={() => onBuy(paymentAmount)}
             >
                 {isBuying ? <Spinner /> : "Buy Now"}
             </Button>

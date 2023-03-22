@@ -18,12 +18,14 @@ import React from "react";
 
 interface IProps extends Omit<ModalProps, "children"> {
     nft?: INftItem;
+	symbol: string;
     isListing?: boolean;
     onList?: (amount?: number) => void;
 }
 
 export default function ListModal({
     nft,
+	symbol,
     isListing,
     onList,
     ...props
@@ -74,7 +76,7 @@ export default function ListModal({
                                     right="40px"
                                     color="rgba(255,255,255, 0.4)"
                                 >
-                                    FLOP
+                                    {symbol}
                                 </Text>
                             </Flex>
 
