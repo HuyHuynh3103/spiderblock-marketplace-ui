@@ -43,19 +43,28 @@ export const packages: IPackage[] = [
 ];
 
 export const menus: IMenu[] = [
+	{
+		header: "ICO Investment",
+		name: "Invest",
+        url: "/", 
+    },
+	{
+		header: "Faucet Token",
+		name: "Faucet",
+		url: "/faucet"
+	},
     {
-        name: "Invest",
-        url: "/",
+		header: "My Collection",
+        name: "Collection",
+        url: "/collection",
     },
     {
-        name: "Market",
-        url: "/market",
-    },
-    {
+		header: "P2P Trading",
         name: "P2P",
         url: "/p2p",
     },
     {
+		header: "Openning Auction",
         name: "Auction",
         url: "/auction",
     },

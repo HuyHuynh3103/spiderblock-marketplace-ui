@@ -52,7 +52,7 @@ export default function InvestView() {
             setPak(undefined);
             setIsProcessing(false);
         } catch (err: any) {
-            toast(getToast(err))
+            toast(getToast(err.reason || err.message));
             setPak(undefined);
             setIsProcessing(false);
         }

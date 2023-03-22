@@ -29,11 +29,11 @@ export const getDesiredGateWay = () => {
 
 export const SMART_ADDRESS = {
     CROWD_SALE: {
-        97: "0xeb8b938Dc941f2F1Ba1D5b0b44Afa056d5b79222",
+        97: "0xE2140f676F67Dd35a23183B8F85dBF3536C9848C",
         56: "",
     },
     USDT: {
-        97: "0xE1937cAcDA6C1f341c11626193bDff3a2eb3429E",
+        97: "0xEaa83Cf59544E2a111a76c58691e1D08C1b38356",
         56: "",
     },
     NFT: {
@@ -52,4 +52,8 @@ export const SMART_ADDRESS = {
         97: "0x91e1272Adb3804745aA35619843349573A49ECe7",
         56: "",
     },
+	FAUCET: {
+		97: "0x8cE51b4A6e1d23BAa68AB6E2Acd0dc447b7E3102",
+		56: ""
+	}
 };

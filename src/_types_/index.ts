@@ -21,6 +21,7 @@ export interface IPackage {
 }
 
 export interface IMenu {
+	header: string;
     name: string;
     url: string;
 }

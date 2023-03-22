@@ -1,4 +1,5 @@
 import { ProcessingModal, SuccessModal } from "@/components";
+import Empty from "@/components/Empty";
 import AuctionContract from "@/contracts/AuctionContract";
 import MarketContract from "@/contracts/MarketContract";
 import NftContract from "@/contracts/NftContract";
@@ -25,7 +26,7 @@ import ListModal from "./components/ListModal";
 import Nft from "./components/Nft";
 import TransferModal from "./components/TransferModal";
 
-export default function MarketView() {
+export default function CollectionView() {
     const toast = useToast();
     const { data: signer } = useSigner({ chainId: getChainIdFromEnv() });
     const { address } = useAccount();
@@ -46,23 +47,31 @@ export default function MarketView() {
     } = useDisclosure();
     const getListNft = React.useCallback(async () => {
         if (address) {
-            console.log("getlist");
-            const nftContract = new NftContract();
-            const marketContract = new MarketContract();
-            const nfts = await nftContract.getListNfts(address);
-            setNfts(nfts.filter((nft) => nft.name));
-            const nftItems = await marketContract.getNFTListedOnMarketplace();
-            const listedNfts = await nftContract.getNftInfo(nftItems);
-            setNftsListed(listedNfts);
-
-            const auctionContract = new AuctionContract();
-            const auctionNfts = await auctionContract.getAuctionActive();
-            console.log(auctionNfts);
-            const myAuctions = auctionNfts.filter(
-                (p) => p.auctioneer === address
-            );
-            const nftAuctions = await nftContract.getNftAuctionInfo(myAuctions);
-            setAuctions(nftAuctions);
+            try {
+                console.log("getlist");
+                const nftContract = new NftContract();
+                const marketContract = new MarketContract();
+                const nfts = await nftContract.getListNfts(address);
+                console.log("Listed NFTs", address);
+                setNfts(nfts.filter((nft) => nft.name));
+                const nftItems =
+                    await marketContract.getNFTListedOnMarketplace();
+                const listedNfts = await nftContract.getNftInfo(nftItems);
+                setNftsListed(listedNfts);
+                const auctionContract = new AuctionContract();
+                const auctionNfts = await auctionContract.getAuctionActive();
+                console.log(auctionNfts);
+                const myAuctions = auctionNfts.filter(
+                    (p) => p.auctioneer === address
+                );
+                const nftAuctions = await nftContract.getNftAuctionInfo(
+                    myAuctions
+                );
+                setAuctions(nftAuctions);
+            } catch (error: any) {
+                console.log("get list nft failed", error);
+                toast(getToast(error.reason || error.message));
+            }
         } else {
             setNfts([]);
             setNftsListed([]);
@@ -115,14 +124,12 @@ export default function MarketView() {
             setTxHash(tx);
             onOpenSuccess();
             setNftSelected(undefined);
-            setIsProcessing.off();
             setOpenTransferModal.off();
             await getListNft();
-        } catch (er: any) {
-            console.error(er);
-            setIsProcessing.off();
-            toast(getToast(er));
+        } catch (err: any) {
+            toast(getToast(err.reason || err.message));
         }
+        setIsProcessing.off();
     };
     const handleTransfer = async (addressTo: string) => {
         setIsProcessing.on();
@@ -141,14 +148,13 @@ export default function MarketView() {
             console.log("tx");
             setTxHash(tx);
             setOpenTransferModal.off();
-            setIsProcessing.off();
             onOpenSuccess();
             await getListNft();
-        } catch (error: any) {
-            console.error(error);
+        } catch (err: any) {
             setIsProcessing.off();
-            toast(getToast(error));
+            toast(getToast(err.reason || err.message));
         }
+        setIsProcessing.off();
     };
     const handleUnList = async (item: INftItem) => {
         if (!signer) {
@@ -164,9 +170,8 @@ export default function MarketView() {
             setIsUnList.off();
             onOpenSuccess();
             await getListNft();
-        } catch (error: any) {
-            console.error(error);
-            toast(getToast(error));
+        } catch (err: any) {
+            toast(getToast(err.reason || err.message));
         }
     };
     const handleCancelAuction = async (item: IAuctionInfo) => {
@@ -180,9 +185,8 @@ export default function MarketView() {
             setTxHash(tx);
             onOpenSuccess();
             await getListNft();
-        } catch (error: any) {
-            console.error(error);
-            toast(getToast(error));
+        } catch (err: any) {
+            toast(getToast(err.reason || err.message));
         }
     };
     const handleCreateAuction = async (price: number, endTime: Date) => {
@@ -209,19 +213,18 @@ export default function MarketView() {
             setTxHash(tx);
             onOpenSuccess();
             setNftSelected(undefined);
-            setIsProcessing.off();
             setOpenTransferModal.off();
             await getListNft();
-        } catch (er: any) {
-            console.error(er);
-            setIsProcessing.off();
-            toast(getToast(er));
+        } catch (err: any) {
+            console.error(err);
+            toast(getToast(err.reason || err.message));
         }
+        setIsProcessing.off();
     };
 
     return (
-        <Flex w="full">
-            <Tabs>
+        <Flex w="full" p={{lg: "30px 20px"}}>
+            <Tabs w="full" align="center">
                 <TabList
                     borderBottomColor="#5A5A5A"
                     borderBottomRadius={2}
@@ -260,44 +263,55 @@ export default function MarketView() {
                 </TabList>
                 <TabPanels>
                     <TabPanel>
-                        <SimpleGrid
-                            w="full"
-                            columns={{ base: 1, md: 2, lg: 3 }}
-                            spacing={10}
-                        >
-                            {nfts.map((nft, index) => (
-                                <Nft
-                                    item={nft}
-                                    key={index}
-                                    index={index}
-                                    isAuction
-                                    isList
-                                    isTransfer
-                                    onAction={(a) => selectAction(a, nft)}
-                                />
-                            ))}
-                        </SimpleGrid>
+                        {nfts.length == 0 ? (
+                            <Empty text='No NFTs Found' />
+                        ) : (
+                            <SimpleGrid
+                                w="full"
+                                columns={{ base: 1, md: 2, lg: 3 }}
+                                spacing={10}
+                            >
+                                {nfts.map((nft, index) => (
+                                    <Nft
+                                        item={nft}
+                                        key={index}
+                                        index={index}
+                                        isAuction
+                                        isList
+                                        isTransfer
+                                        onAction={(a) => selectAction(a, nft)}
+                                    />
+                                ))}
+                            </SimpleGrid>
+                        )}
                     </TabPanel>
 
                     <TabPanel>
-                        <SimpleGrid
-                            w="full"
-                            columns={{ base: 1, md: 2, lg: 3 }}
-                            spacing={10}
-                        >
-                            {nftsListed.map((nft, index) => (
-                                <Nft
-                                    item={nft}
-                                    key={index}
-                                    index={index}
-                                    isUnList
-                                    onAction={(a) => selectAction(a, nft)}
-                                />
-                            ))}
-                        </SimpleGrid>
+                        {nftsListed.length == 0 ? (
+                            <Empty text="No NFTs Listed" />
+                        ) : (
+                            <SimpleGrid
+                                w="full"
+                                columns={{ base: 1, md: 2, lg: 3 }}
+                                spacing={10}
+                            >
+                                {nftsListed.map((nft, index) => (
+                                    <Nft
+                                        item={nft}
+                                        key={index}
+                                        index={index}
+                                        isUnList
+                                        onAction={(a) => selectAction(a, nft)}
+                                    />
+                                ))}
+                            </SimpleGrid>
+                        )}
                     </TabPanel>
 
                     <TabPanel>
+                        {auctions.length == 0 ? (
+                            <Empty text="No Auction Found" />
+                        ) : (
                         <SimpleGrid
                             w="full"
                             columns={{ base: 1, md: 2, lg: 3 }}
@@ -311,7 +325,7 @@ export default function MarketView() {
                                     onAction={() => handleCancelAuction(nft)}
                                 />
                             ))}
-                        </SimpleGrid>
+                        </SimpleGrid>)}
                     </TabPanel>
                 </TabPanels>
             </Tabs>

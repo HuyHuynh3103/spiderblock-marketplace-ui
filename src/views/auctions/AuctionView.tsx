@@ -10,6 +10,7 @@ import { useAccount, useSigner } from "wagmi";
 import { getToast } from "@/utils";
 import getChainIdFromEnv from "@/contracts/utils/common";
 import FlopContract from "@/contracts/FlopContract";
+import Empty from "@/components/Empty";
 
 export default function AuctionView() {
     const toast = useToast();
@@ -18,10 +19,9 @@ export default function AuctionView() {
     const [nfts, setNfts] = React.useState<IAuctionInfo[]>([]);
     const [nftSelected, setNftSelected] = React.useState<IAuctionInfo>();
     const [isOpen, setIsOpen] = useBoolean();
-    const [isAuctionSuccess, setIsAuctionSuccess] =
-        React.useState<boolean>(false);
+    const [isAuctionSuccess, setIsAuctionSuccess] = useBoolean();
 
-    const [isProcessing, setIsProcessing] = React.useState<boolean>(false);
+    const [isProcessing, setIsProcessing] = useBoolean();
     const [txHash, setTxHash] = React.useState<string>();
 
     const getListAuctions = React.useCallback(async () => {
@@ -42,7 +42,7 @@ export default function AuctionView() {
             return;
         }
         if (!nftSelected) return;
-        setIsProcessing(true);
+        setIsProcessing.on();
         try {
             const auctionContract = new AuctionContract(signer);
             const flopContract = new FlopContract(signer);
@@ -52,29 +52,34 @@ export default function AuctionView() {
                 bid
             );
             setTxHash(tx);
-            setIsAuctionSuccess(true);
-            setIsOpen.off();
+            setIsAuctionSuccess.on();
             await getListAuctions();
         } catch (ex: any) {
-            setIsAuctionSuccess(false);
+            toast(getToast(ex.reason || ex.message));
         }
-        setIsProcessing(false);
+        setIsAuctionSuccess.off();
+        setIsProcessing.off();
+        setIsOpen.off();
     };
 
     return (
-        <Flex w="full">
-            <SimpleGrid columns={4} spacing="20px">
-                {nfts.map((nft) => (
-                    <NftAuction
-                        item={nft}
-                        key={nft.id}
-                        onAction={() => {
-                            setNftSelected(nft);
-                            setIsOpen.on();
-                        }}
-                    />
-                ))}
-            </SimpleGrid>
+        <Flex w="full" p={{lg: "30px 20px"}}>
+            {nfts.length === 0 ? (
+                <Empty text="There are no auction openning now" />
+            ) : (
+                <SimpleGrid columns={4} spacing="20px">
+                    {nfts.map((nft) => (
+                        <NftAuction
+                            item={nft}
+                            key={nft.id}
+                            onAction={() => {
+                                setNftSelected(nft);
+                                setIsOpen.on();
+                            }}
+                        />
+                    ))}
+                </SimpleGrid>
+            )}
 
             <AuctionModal
                 isOpen={isOpen}
@@ -87,7 +92,7 @@ export default function AuctionView() {
             <SuccessModal
                 hash={txHash}
                 isOpen={isAuctionSuccess}
-                onClose={() => setIsAuctionSuccess(false)}
+                onClose={() => setIsAuctionSuccess.off()}
             />
         </Flex>
     );

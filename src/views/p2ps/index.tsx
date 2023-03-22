@@ -1,11 +1,12 @@
 import { SuccessModal } from "@/components";
+import Empty from "@/components/Empty";
 import FlopContract from "@/contracts/FlopContract";
 import MarketContract from "@/contracts/MarketContract";
 import NftContract from "@/contracts/NftContract";
 import getChainIdFromEnv from "@/contracts/utils/common";
 import { getToast } from "@/utils";
 import { INftItem } from "@/_types_";
-import { SimpleGrid, useDisclosure, useToast } from "@chakra-ui/react";
+import { SimpleGrid, useDisclosure, useToast, Flex } from "@chakra-ui/react";
 import React from "react";
 import { useAccount, useSigner } from "wagmi";
 import NftP2P from "./components/NftP2P";
@@ -24,10 +25,11 @@ export default function P2PView() {
             const marketContract = new MarketContract();
             const nftContract = new NftContract();
             const listedItem = await marketContract.getNFTListedOnMarketplace();
+
             const nftListed = await nftContract.getNftInfo(listedItem);
             setNfts(nftListed);
-        } catch (error) {
-            console.log("Error", error);
+        } catch (error: any) {
+            toast(getToast(error.reason || error.message));
         }
     }, []);
     const handleBuy = React.useCallback(async (nft: INftItem) => {
@@ -43,8 +45,8 @@ export default function P2PView() {
             const tx = await marketContract.buyNft(nft.id, nft.price);
             setTxHash(tx);
             onOpen();
-        } catch (er: any) {
-            toast(getToast(er));
+        } catch (error: any) {
+            toast(getToast(error.reason || error.message));
         }
         setCurrentNft(undefined);
     }, []);
@@ -53,28 +55,32 @@ export default function P2PView() {
     }, [getListedNfts]);
 
     return (
-        <>
-            <SimpleGrid
-                w="full"
-                columns={{ base: 1, md: 2, lg: 3 }}
-                spacing={10}
-            >
-                {nfts.map((nft) => (
-                    <NftP2P
-                        key={nft.id}
-                        item={nft}
-                        isDisabled={!address}
-                        isBuying={currentNft?.id === nft.id}
-                        onAction={() => handleBuy(nft)}
-                    />
-                ))}
-            </SimpleGrid>
+        <Flex w="full" p={{lg: "30px 20px"}}>
+            {nfts.length === 0 ? (
+                <Empty text="There are no nfts in marketplace" />
+            ) : (
+                <SimpleGrid
+                    h="full"
+                    columns={{ base: 1, md: 2, lg: 3 }}
+                    spacing={10}
+                >
+                    {nfts.map((nft) => (
+                        <NftP2P
+                            key={nft.id}
+                            item={nft}
+                            isDisabled={!address}
+                            isBuying={currentNft?.id === nft.id}
+                            onAction={() => handleBuy(nft)}
+                        />
+                    ))}
+                </SimpleGrid>
+            )}
             <SuccessModal
                 title="BUY NFT"
                 hash={txHash}
                 isOpen={isOpen}
                 onClose={onClose}
             />
-        </>
+        </Flex>
     );
 }

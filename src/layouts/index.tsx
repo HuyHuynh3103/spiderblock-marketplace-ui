@@ -2,7 +2,9 @@ import { ConnectWallet, WalletInfo } from "@/components";
 import { menus } from "@/constants";
 import { HamburgerIcon } from "@chakra-ui/icons";
 import {
-	Button,
+    Box,
+    Button,
+    Divider,
     Flex,
     Heading,
     Menu,
@@ -11,9 +13,10 @@ import {
     MenuList,
     SimpleGrid,
     Spacer,
+    useDimensions,
 } from "@chakra-ui/react";
 import { useRouter } from "next/router";
-import React, { ReactNode } from "react";
+import React, { ReactNode, useEffect, useRef, useState } from "react";
 import { useAccount } from "wagmi";
 
 interface IProps {
@@ -32,28 +35,23 @@ export default function MainLayout({ children }: IProps) {
             setCurrentMenu(menu);
         }
     }, [asPath]);
+
     return (
-        <Flex
-            w={{ base: "full", lg: "70%" }}
-            flexDirection="column"
-            margin="50px auto"
-        >
-            <Flex gap="10px" margin="auto 20px">
+        <Box w="100vw" h="100vh" flexDirection="column" padding={{base: "50px 20px" , lg:"50px"}}>
+            <Flex gap="10px">
                 <Heading
+					color="#fedf56"
                     fontWeight="bold"
                     fontSize={{ base: "20px", lg: "30px" }}
                 >
-                    Blockchain Trainee
+                    Spider Block Explorer
                 </Heading>
                 <Spacer />
                 <SimpleGrid columns={{ base: 1, md: 2 }} gap={5}>
                     <Menu>
-                        <MenuButton
-							as={Button}
-							rightIcon={<HamburgerIcon />}
-						>
-							{currentMenu.name}
-						</MenuButton>
+                        <MenuButton as={Button} rightIcon={<HamburgerIcon />}>
+                            {currentMenu.name}
+                        </MenuButton>
                         <MenuList>
                             {menus.map((menu, index) => (
                                 <MenuItem as="a" href={menu.url} key={index}>
@@ -65,9 +63,16 @@ export default function MainLayout({ children }: IProps) {
                     {!isConnected ? <ConnectWallet /> : <WalletInfo />}
                 </SimpleGrid>
             </Flex>
-            <Flex flexDirection="column" m="10px">
+
+            <Flex flexDirection="column" mt="10px">
+                <Heading
+                    fontSize={{ base: "18px", lg: "25px" }}
+                >
+                    {currentMenu.header}
+                </Heading>
+                <Divider my="10px" />
                 {children}
             </Flex>
-        </Flex>
+        </Box>
     );
 }
