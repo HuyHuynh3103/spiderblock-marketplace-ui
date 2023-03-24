@@ -3,8 +3,6 @@ import type { AppProps } from "next/app";
 import { ChakraProvider } from "@chakra-ui/react";
 import theme from "@/themes";
 import MainLayout from "@/layouts";
-import { Provider } from "react-redux";
-import store from "@/reduxs/store";
 import {
     EthereumClient,
     w3mConnectors,
@@ -44,20 +42,20 @@ export default function App({ Component, pageProps }: AppProps) {
         setReady(true);
     }, []);
     return (
-        <Provider store={store}>
+        <WagmiConfig client={wagmiClient}>
             <ChakraProvider theme={theme}>
                 {ready ? (
-                    <WagmiConfig client={wagmiClient}>
+                    
                         <MainLayout>
                             <Component {...pageProps} />
                         </MainLayout>
-                    </WagmiConfig>
+                    
                 ) : null}
                 <Web3Modal
                     projectId={projectId}
                     ethereumClient={ethereumClient}
                 />
             </ChakraProvider>
-        </Provider>
+        </WagmiConfig>
     );
 }
