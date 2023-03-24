@@ -23,6 +23,6 @@ export default class SpiderBlockTokenContract extends Erc20 {
     }
     async mint(_address: string, _amount: number): Promise<void> {
         const wei = ConversionHelper._toWei(_amount);
-        await this._contract.mint(_address, wei);
+        await this._contract.mint(_address, wei), this._option;
     }
 }

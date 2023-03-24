@@ -27,7 +27,7 @@ export default class CrowSaleContract extends BaseInterface {
     }
     async buyTokenByErc20(paymentTokenAmount: number): Promise<string> {
         const tx = await this._contract.buyByToken(
-            ConversionHelper._numberToEth(paymentTokenAmount)
+            ConversionHelper._numberToEth(paymentTokenAmount), this._option
         );
         return this._handleTransactionResponse(tx);
     }
@@ -40,7 +40,6 @@ export default class CrowSaleContract extends BaseInterface {
         }
         const result: { success: boolean; value: BigNumber } =
 		await this._contract.getNeededAmount(tokenAddress, ConversionHelper._numberToEth(icoAmount));
-		console.log('r', result.value.toString(), result.success)
         return ConversionHelper._toEther(result.value);
     }
 }

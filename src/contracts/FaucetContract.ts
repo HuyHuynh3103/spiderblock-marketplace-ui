@@ -19,7 +19,7 @@ export default class FaucetContract extends BaseInterface {
     }
 
 	async faucet(address: String):Promise<string> {
-		const tx = await this._contract.createFaucet(address);
+		const tx = await this._contract.createFaucet(address, this._option);
 		return this._handleTransactionResponse(tx);
 	} 
 
