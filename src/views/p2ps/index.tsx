@@ -42,7 +42,11 @@ export default function P2PView() {
         }
     }, []);
     const handleBuy = React.useCallback(async (nft: INftItem) => {
-        if (!signer || !nft.price) return;
+        if (!signer) {
+            toast(getToast("Please connect wallet first", "info", "Info"));
+            return;
+        }
+        if (!nft.price) return;
         try {
             setCurrentNft(nft);
             const marketContract = new MarketContract(signer);

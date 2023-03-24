@@ -24,7 +24,8 @@ export const getToast = (
             status,
             position: "top-right",
             description,
-            duration: 3000,
+            duration: 2000,
+			isClosable: true
         };
     let msg = "something wrong!";
     // @ts-ignore no problem in operation, although type error appears.
@@ -37,7 +38,7 @@ export const getToast = (
         status,
         position: "top-right",
         description: msg,
-        duration: 3000,
+        duration: 2000,
 		isClosable: true
     };
 };
