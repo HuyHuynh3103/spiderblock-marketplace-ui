@@ -10,19 +10,21 @@ import {
     ModalCloseButton,
     Image,
     Input,
-    Spinner,
 } from "@chakra-ui/react";
 import { INftItem } from "@/_types_";
 import React from "react";
+import { getTime, getUnixTime } from "date-fns";
 interface IProps extends Omit<ModalProps, "children"> {
     nft?: INftItem;
     isProcessing?: boolean;
+	symbol: string;
     onAuction?: (amount?: number, expireDate?: Date | null) => void;
 }
 
 export default function AuctionModal({
     nft,
     isProcessing,
+	symbol,
     onAuction,
     ...props
 }: IProps) {
@@ -75,7 +77,7 @@ export default function AuctionModal({
                                     right="40px"
                                     color="rgba(255,255,255, 0.4)"
                                 >
-                                    IPT
+                                    {symbol}
                                 </Text>
                             </Flex>
 
@@ -88,7 +90,7 @@ export default function AuctionModal({
                                 }
                                 placeholder="Select Date and Time"
                                 size="md"
-                                min={new Date().toISOString().split("T")[0]}
+                                min={new Date().toISOString().split(".")[0]}
                                 type="datetime-local"
                                 mb="10px"
                                 border-radius="6px"

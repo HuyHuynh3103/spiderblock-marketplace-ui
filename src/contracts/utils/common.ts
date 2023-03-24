@@ -45,7 +45,7 @@ export const SMART_ADDRESS = {
         56: "",
     },
     AUCTION: {
-        97: "0x7FDC4475c948eE3Ba33fE0b5f7FF8e4e63EBea63",
+        97: "0xbFc13f86EC845BED0c47903a986cc49588d80C1e",
         56: "",
     },
     SPIDERBLOCK: {

@@ -22,7 +22,7 @@ export default function AuctionView() {
 
     const [isProcessing, setIsProcessing] = useBoolean();
     const [txHash, setTxHash] = React.useState<string>();
-	const [symbol, setSymbol] = React.useState<string>("");
+    const [symbol, setSymbol] = React.useState<string>("");
     const getSymbol = React.useCallback(async () => {
         const spiderBlockContract = new SpiderBlockTokenContract();
         const symbol = await spiderBlockContract.symbol();
@@ -31,9 +31,9 @@ export default function AuctionView() {
     React.useEffect(() => {
         getSymbol();
     }, [getSymbol]);
-	
+
     const getListAuctions = React.useCallback(async () => {
-		const auctionContract = new AuctionContract();
+        const auctionContract = new AuctionContract();
         const nfts = await auctionContract.getAuctionActive();
         const nftContract = new NftContract();
         const auctionItems = await nftContract.getNftAuctionInfo(nfts);
@@ -54,7 +54,10 @@ export default function AuctionView() {
         try {
             const auctionContract = new AuctionContract(signer);
             const spiderBlockContract = new SpiderBlockTokenContract(signer);
-            await spiderBlockContract.approve(auctionContract._contractAddress, bid);
+            await spiderBlockContract.approve(
+                auctionContract._contractAddress,
+                bid
+            );
             const tx = await auctionContract.joinAuction(
                 nftSelected.auctionId,
                 bid
@@ -75,7 +78,11 @@ export default function AuctionView() {
             {nfts.length === 0 ? (
                 <Empty text="There are no auction openning now" />
             ) : (
-                <SimpleGrid columns={4} spacing="20px">
+                <SimpleGrid
+                    w="full"
+                    columns={{ base: 1, md: 2, lg: 3 }}
+                    spacing={10}
+                >
                     {nfts.map((nft) => (
                         <NftAuction
                             item={nft}
@@ -90,7 +97,7 @@ export default function AuctionView() {
             )}
 
             <AuctionModal
-				symbol={symbol}
+                symbol={symbol}
                 isOpen={isOpen}
                 isProcessing={isProcessing}
                 nft={nftSelected}

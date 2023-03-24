@@ -19,6 +19,7 @@ import {
     useDisclosure,
     useToast,
 } from "@chakra-ui/react";
+import { getTime } from "date-fns";
 import React from "react";
 import { useAccount, useSigner } from "wagmi";
 import NftAuction from "../auctions/components/NftAuction";
@@ -70,10 +71,11 @@ export default function CollectionView() {
                 setNftsListed(listedNfts);
                 const auctionContract = new AuctionContract();
                 const auctionNfts = await auctionContract.getAuctionActive();
-                console.log(auctionNfts);
+                console.log("auction",auctionNfts);
                 const myAuctions = auctionNfts.filter(
                     (p) => p.auctioneer === address
                 );
+				console.log("myAuctions",myAuctions)
                 const nftAuctions = await nftContract.getNftAuctionInfo(
                     myAuctions
                 );
@@ -191,7 +193,7 @@ export default function CollectionView() {
         }
         try {
             const auctionContract = new AuctionContract(signer);
-            const tx = await auctionContract.cancelAuction(item.id);
+            const tx = await auctionContract.cancelAuction(item.auctionId);
             setTxHash(tx);
             onOpenSuccess();
             await getListNft();
@@ -213,8 +215,8 @@ export default function CollectionView() {
                 auctionContract._contractAddress,
                 nftSelected.id
             );
-            const startTimestamp = Math.floor(Date.now());
-            const endTimestamp = endTime.getTime();
+            const startTimestamp = getTime(new Date());
+            const endTimestamp = getTime(endTime);
             const tx = await auctionContract.createAuction(
                 nftSelected.id,
                 price,
@@ -351,6 +353,7 @@ export default function CollectionView() {
                 onList={(amount) => handleListNft(amount)}
             />
             <AuctionModal
+				symbol={symbol}
                 isOpen={isOpenAuction}
                 nft={nftSelected}
                 isProcessing={isProcessing}
