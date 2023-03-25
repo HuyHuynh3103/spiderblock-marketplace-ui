@@ -15,8 +15,8 @@ import Empty from "@/components/Empty";
 export default function AuctionView() {
     const toast = useToast();
     const { data: signer } = useSigner({ chainId: getChainIdFromEnv() });
-    const [nfts, setNfts] = React.useState<IAuctionInfo[]>([]);
-    const [nftSelected, setNftSelected] = React.useState<IAuctionInfo>();
+    const [auctions, setAuctions] = React.useState<IAuctionInfo[]>([]);
+    const [auctionSelected, setAuctionSelected] = React.useState<IAuctionInfo>();
     const [isOpen, setIsOpen] = useBoolean();
     const [isAuctionSuccess, setIsAuctionSuccess] = useBoolean();
 
@@ -37,7 +37,8 @@ export default function AuctionView() {
         const nfts = await auctionContract.getAuctionActive();
         const nftContract = new NftContract();
         const auctionItems = await nftContract.getNftAuctionInfo(nfts);
-        setNfts(auctionItems);
+		console.log(auctionItems)
+        setAuctions(auctionItems);
     }, []);
 
     React.useEffect(() => {
@@ -49,7 +50,7 @@ export default function AuctionView() {
             toast(getToast("Please connect wallet first", "info", "Info"));
             return;
         }
-        if (!nftSelected) return;
+        if (!auctionSelected) return;
         setIsProcessing.on();
         try {
             const auctionContract = new AuctionContract(signer);
@@ -59,7 +60,7 @@ export default function AuctionView() {
                 bid
             );
             const tx = await auctionContract.joinAuction(
-                nftSelected.auctionId,
+                auctionSelected.auctionId,
                 bid
             );
             setTxHash(tx);
@@ -75,7 +76,7 @@ export default function AuctionView() {
 
     return (
         <Flex w="full" p={{ lg: "30px 20px" }}>
-            {nfts.length === 0 ? (
+            {auctions.length === 0 ? (
                 <Empty text="There are no auction openning now" />
             ) : (
                 <SimpleGrid
@@ -83,12 +84,12 @@ export default function AuctionView() {
                     columns={{ base: 1, md: 2, lg: 3 }}
                     spacing={10}
                 >
-                    {nfts.map((nft) => (
+                    {auctions.map((nft) => (
                         <NftAuction
                             item={nft}
                             key={nft.id}
                             onAction={() => {
-                                setNftSelected(nft);
+                                setAuctionSelected(nft);
                                 setIsOpen.on();
                             }}
                         />
@@ -100,7 +101,7 @@ export default function AuctionView() {
                 symbol={symbol}
                 isOpen={isOpen}
                 isProcessing={isProcessing}
-                nft={nftSelected}
+                nft={auctionSelected}
                 onClose={() => setIsOpen.off()}
                 onAuction={(amount) => handleAuction(amount)}
             />

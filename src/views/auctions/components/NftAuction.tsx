@@ -91,7 +91,7 @@ export default function NftAuction({ item, isCancel, onAction }: IProps) {
 
             <SimpleGrid w="full" columns={2} spacingX="10px" mt="10px">
                 <Button variant="outline" disabled>
-                    <CountdownTimer targetDate={item.endTime} />
+                    <CountdownTimer targetDate={item.endTime * 1000} />
                 </Button>
                 <Button
                     variant={isCancel ? "outline" : "primary"}

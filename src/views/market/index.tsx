@@ -19,7 +19,7 @@ import {
     useDisclosure,
     useToast,
 } from "@chakra-ui/react";
-import { getTime } from "date-fns";
+import { getTime, getUnixTime } from "date-fns";
 import React from "react";
 import { useAccount, useSigner } from "wagmi";
 import NftAuction from "../auctions/components/NftAuction";
@@ -42,7 +42,7 @@ export default function CollectionView() {
     const [isOpenTransferModal, setOpenTransferModal] = useBoolean();
     const [isProcessing, setIsProcessing] = useBoolean();
     const [isOpenAuction, setIsOpenAuction] = useBoolean();
-	const [symbol, setSymbol] = React.useState<string>("");
+    const [symbol, setSymbol] = React.useState<string>("");
     const getSymbol = React.useCallback(async () => {
         const spiderBlockContract = new SpiderBlockTokenContract();
         const symbol = await spiderBlockContract.symbol();
@@ -71,11 +71,11 @@ export default function CollectionView() {
                 setNftsListed(listedNfts);
                 const auctionContract = new AuctionContract();
                 const auctionNfts = await auctionContract.getAuctionActive();
-                console.log("auction",auctionNfts);
+                console.log("auction", auctionNfts);
                 const myAuctions = auctionNfts.filter(
                     (p) => p.auctioneer === address
                 );
-				console.log("myAuctions",myAuctions)
+                console.log("myAuctions", myAuctions);
                 const nftAuctions = await nftContract.getNftAuctionInfo(
                     myAuctions
                 );
@@ -207,7 +207,7 @@ export default function CollectionView() {
             return;
         }
         if (!nftSelected) return;
-		setIsProcessing.on();
+        setIsProcessing.on();
         try {
             const nftContract = new NftContract(signer);
             const auctionContract = new AuctionContract(signer);
@@ -215,8 +215,19 @@ export default function CollectionView() {
                 auctionContract._contractAddress,
                 nftSelected.id
             );
-            const startTimestamp = getTime(new Date());
-            const endTimestamp = getTime(endTime);
+            const block = await signer.provider?.getBlock("latest");
+            console.log("block", block);
+            if (!block) {
+                throw new Error("Can not get block");
+            }
+            const startTimestamp = block?.timestamp + 60;
+            const endTimestamp = getUnixTime(endTime);
+            if (startTimestamp > endTimestamp) {
+                throw new Error("Start time must be less than end time");
+            }
+            console.log("startTimestamp", startTimestamp);
+            console.log("endTimestamp", endTimestamp);
+
             const tx = await auctionContract.createAuction(
                 nftSelected.id,
                 price,
@@ -236,7 +247,7 @@ export default function CollectionView() {
     };
 
     return (
-        <Flex w="full" p={{lg: "30px 20px"}}>
+        <Flex w="full" p={{ lg: "30px 20px" }}>
             <Tabs w="full" align="center">
                 <TabList
                     borderBottomColor="#5A5A5A"
@@ -277,7 +288,7 @@ export default function CollectionView() {
                 <TabPanels>
                     <TabPanel>
                         {nfts.length == 0 ? (
-                            <Empty text='No NFTs Found' />
+                            <Empty text="No NFTs Found" />
                         ) : (
                             <SimpleGrid
                                 w="full"
@@ -325,27 +336,30 @@ export default function CollectionView() {
                         {auctions.length == 0 ? (
                             <Empty text="No Auction Found" />
                         ) : (
-                        <SimpleGrid
-                            w="full"
-                            columns={{ base: 1, md: 2, lg: 3 }}
-                            spacing={10}
-                        >
-                            {auctions.map((nft, index) => (
-                                <NftAuction
-                                    item={nft}
-                                    key={index}
-                                    isCancel
-                                    onAction={() => handleCancelAuction(nft)}
-                                />
-                            ))}
-                        </SimpleGrid>)}
+                            <SimpleGrid
+                                w="full"
+                                columns={{ base: 1, md: 2, lg: 3 }}
+                                spacing={10}
+                            >
+                                {auctions.map((nft, index) => (
+                                    <NftAuction
+                                        item={nft}
+                                        key={index}
+                                        isCancel
+                                        onAction={() =>
+                                            handleCancelAuction(nft)
+                                        }
+                                    />
+                                ))}
+                            </SimpleGrid>
+                        )}
                     </TabPanel>
                 </TabPanels>
             </Tabs>
 
             <ProcessingModal isOpen={isUnList} onClose={() => {}} />
             <ListModal
-				symbol={symbol}
+                symbol={symbol}
                 isOpen={isOpenListing}
                 nft={nftSelected}
                 isListing={isProcessing}
@@ -353,7 +367,7 @@ export default function CollectionView() {
                 onList={(amount) => handleListNft(amount)}
             />
             <AuctionModal
-				symbol={symbol}
+                symbol={symbol}
                 isOpen={isOpenAuction}
                 nft={nftSelected}
                 isProcessing={isProcessing}

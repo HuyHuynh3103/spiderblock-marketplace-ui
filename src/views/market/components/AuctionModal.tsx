@@ -13,24 +13,34 @@ import {
 } from "@chakra-ui/react";
 import { INftItem } from "@/_types_";
 import React from "react";
-import { getTime, getUnixTime } from "date-fns";
+import { useSigner } from "wagmi";
 interface IProps extends Omit<ModalProps, "children"> {
     nft?: INftItem;
     isProcessing?: boolean;
-	symbol: string;
+    symbol: string;
     onAuction?: (amount?: number, expireDate?: Date | null) => void;
 }
 
 export default function AuctionModal({
     nft,
     isProcessing,
-	symbol,
+    symbol,
     onAuction,
     ...props
 }: IProps) {
+    const { data: signer } = useSigner();
     const [amount, setAmount] = React.useState<number>();
     const [startDate, setStartDate] = React.useState<Date | null>(new Date());
-
+    const [blockTimestamp, setBlockTimestamp] = React.useState<number>(0);
+    const getBlockTimestamp = React.useCallback(async () => {
+        if (signer && signer.provider) {
+            const block = await signer.provider?.getBlock("latest");
+            setBlockTimestamp(block?.timestamp || 0);
+        }
+    }, [signer]);
+    React.useEffect(() => {
+        getBlockTimestamp();
+    }, [getBlockTimestamp]);
     return (
         <Modal closeOnOverlayClick={false} {...props}>
             <ModalOverlay
@@ -90,7 +100,11 @@ export default function AuctionModal({
                                 }
                                 placeholder="Select Date and Time"
                                 size="md"
-                                min={new Date().toISOString().split(".")[0]}
+                                min={
+                                    new Date((blockTimestamp + 60) * 1000)
+                                        .toISOString()
+                                        .split(".")[0]
+                                }
                                 type="datetime-local"
                                 mb="10px"
                                 border-radius="6px"
@@ -101,8 +115,8 @@ export default function AuctionModal({
                                     onAuction && onAuction(amount, startDate)
                                 }
                                 isDisabled={!amount || isProcessing}
-								isLoading={isProcessing}
-								loadingText="Auctioning..."
+                                isLoading={isProcessing}
+                                loadingText="Auctioning..."
                             >
                                 Auction now
                             </Button>
