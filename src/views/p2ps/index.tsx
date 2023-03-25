@@ -20,7 +20,7 @@ export default function P2PView() {
     const [txHash, setTxHash] = React.useState<string>();
     const { isOpen, onClose, onOpen } = useDisclosure();
     const [nfts, setNfts] = React.useState<INftItem[]>([]);
-	const [symbol, setSymbol] = React.useState<string>("");
+    const [symbol, setSymbol] = React.useState<string>("");
     const getSymbol = React.useCallback(async () => {
         const spiderBlockContract = new SpiderBlockTokenContract();
         const symbol = await spiderBlockContract.symbol();
@@ -41,7 +41,7 @@ export default function P2PView() {
             toast(getToast(error.reason || error.message));
         }
     }, []);
-    const handleBuy = React.useCallback(async (nft: INftItem) => {
+    const handleBuy = async (nft: INftItem) => {
         if (!signer) {
             toast(getToast("Please connect wallet first", "info", "Info"));
             return;
@@ -62,7 +62,7 @@ export default function P2PView() {
             toast(getToast(error.reason || error.message));
         }
         setCurrentNft(undefined);
-    }, []);
+    };
     React.useEffect(() => {
         getListedNfts();
     }, [getListedNfts]);
@@ -79,7 +79,7 @@ export default function P2PView() {
                 >
                     {nfts.map((nft) => (
                         <NftP2P
-							symbol={symbol}
+                            symbol={symbol}
                             key={nft.id}
                             item={nft}
                             isDisabled={!address}
