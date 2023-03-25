@@ -17,25 +17,25 @@ import { IAuctionInfo } from "@/_types_";
 import React from "react";
 
 interface IProps extends Omit<ModalProps, "children"> {
-    nft?: IAuctionInfo;
-	symbol: string;
+    auction?: IAuctionInfo;
+    symbol: string;
     isProcessing?: boolean;
     onAuction?: (amount: number) => void;
 }
 
 export default function AuctionModal({
-    nft,
-	symbol,
+    auction,
+    symbol,
     isProcessing,
     onAuction,
     ...props
 }: IProps) {
     const [amount, setAmount] = React.useState<number>(0);
-	React.useEffect(() => {
-		if(nft) {
-			setAmount(nft.lastBid);
-		}
-	}, [nft])
+    React.useEffect(() => {
+        if (auction) {
+            setAmount(auction.lastBid);
+        }
+    }, [auction]);
     return (
         <Modal closeOnOverlayClick={false} {...props}>
             <ModalOverlay
@@ -55,8 +55,8 @@ export default function AuctionModal({
                             AUCTION
                         </Heading>
                         <Image
-                            src={nft?.image}
-                            alt={nft?.name}
+                            src={auction?.image}
+                            alt={auction?.name}
                             borderRadius="20px"
                             w="80%"
                             mb="20px"
@@ -72,8 +72,8 @@ export default function AuctionModal({
                             <Flex w="full" my="10px">
                                 <Input
                                     w="full"
-									value={amount}
-									min={nft?.lastBid ?? 0}
+                                    value={amount}
+                                    min={auction?.lastBid ?? 0}
                                     onChange={(e) =>
                                         setAmount(Number(e.target.value))
                                     }

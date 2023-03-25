@@ -44,7 +44,7 @@ export default function MainLayout({ children }: IProps) {
                     fontWeight="bold"
                     fontSize={{ base: "20px", lg: "30px" }}
                 >
-                    Spider Block Explorer
+                    Spider Block Marketplace
                 </Heading>
                 <Spacer />
                 <SimpleGrid columns={{ base: 1, md: 2 }} gap={5}>

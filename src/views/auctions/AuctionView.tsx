@@ -16,7 +16,8 @@ export default function AuctionView() {
     const toast = useToast();
     const { data: signer } = useSigner({ chainId: getChainIdFromEnv() });
     const [auctions, setAuctions] = React.useState<IAuctionInfo[]>([]);
-    const [auctionSelected, setAuctionSelected] = React.useState<IAuctionInfo>();
+    const [auctionSelected, setAuctionSelected] =
+        React.useState<IAuctionInfo>();
     const [isOpen, setIsOpen] = useBoolean();
     const [isAuctionSuccess, setIsAuctionSuccess] = useBoolean();
 
@@ -37,7 +38,7 @@ export default function AuctionView() {
         const nfts = await auctionContract.getAuctionActive();
         const nftContract = new NftContract();
         const auctionItems = await nftContract.getNftAuctionInfo(nfts);
-		console.log(auctionItems)
+        console.log(auctionItems);
         setAuctions(auctionItems);
     }, []);
 
@@ -101,7 +102,7 @@ export default function AuctionView() {
                 symbol={symbol}
                 isOpen={isOpen}
                 isProcessing={isProcessing}
-                nft={auctionSelected}
+                auction={auctionSelected}
                 onClose={() => setIsOpen.off()}
                 onAuction={(amount) => handleAuction(amount)}
             />
