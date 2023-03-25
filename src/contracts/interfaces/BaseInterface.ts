@@ -16,7 +16,7 @@ export default class BaseInterface {
 		this._contractAddress = address;
         this._abis = abi;
         this._contract = new ethers.Contract(address, abi, provider);
-        this._option = { gasLimit: 300000 };
+        this._option = { gasLimit: 500000 };
     }
     _handleTransactionResponse = async (tx: any) => {
         try {

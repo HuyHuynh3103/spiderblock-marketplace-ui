@@ -13,11 +13,11 @@ import {
     Spinner,
     Heading,
 } from "@chakra-ui/react";
-import { INftItem } from "@/_types_";
+import { IAuctionInfo } from "@/_types_";
 import React from "react";
 
 interface IProps extends Omit<ModalProps, "children"> {
-    nft?: INftItem;
+    nft?: IAuctionInfo;
 	symbol: string;
     isProcessing?: boolean;
     onAuction?: (amount: number) => void;
@@ -31,6 +31,11 @@ export default function AuctionModal({
     ...props
 }: IProps) {
     const [amount, setAmount] = React.useState<number>(0);
+	React.useEffect(() => {
+		if(nft) {
+			setAmount(nft.lastBid);
+		}
+	}, [nft])
     return (
         <Modal closeOnOverlayClick={false} {...props}>
             <ModalOverlay
@@ -67,7 +72,8 @@ export default function AuctionModal({
                             <Flex w="full" my="10px">
                                 <Input
                                     w="full"
-                                    value={amount}
+									value={amount}
+									min={nft?.lastBid ?? 0}
                                     onChange={(e) =>
                                         setAmount(Number(e.target.value))
                                     }

@@ -1,6 +1,8 @@
+
 import { UseToastOptions } from "@chakra-ui/react";
 export const numberFormat = (number: number | string) =>
     new Intl.NumberFormat().format(Number(number));
+
 export const showSortAddress = (address?: string): string => {
     return `${address?.substring(0, 4)}...${address?.substring(
         address.length - 4,
@@ -25,7 +27,7 @@ export const getToast = (
             position: "top-right",
             description,
             duration: 2000,
-			isClosable: true
+            isClosable: true,
         };
     let msg = "something wrong!";
     // @ts-ignore no problem in operation, although type error appears.
@@ -39,6 +41,6 @@ export const getToast = (
         position: "top-right",
         description: msg,
         duration: 2000,
-		isClosable: true
+        isClosable: true,
     };
 };

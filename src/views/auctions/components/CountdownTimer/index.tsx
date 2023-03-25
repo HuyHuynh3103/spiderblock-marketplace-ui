@@ -15,8 +15,8 @@ const ShowCounter = ({
 }) => {
   return (
     <HStack px="0px" spacing="2px">
-      <Text fontSize="15px" px="0px">{days}</Text>    
-      <Text fontSize="15px">:</Text> 
+      <Text fontSize="15px" px="0px">{days} days </Text>    
+      <Text fontSize="15px"> - </Text> 
       <Text fontSize="15px">{hours}</Text>     
       <Text fontSize="15px">:</Text> 
       <Text fontSize="15px">{minutes}</Text>     

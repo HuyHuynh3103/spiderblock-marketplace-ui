@@ -33,7 +33,6 @@ export default class NftContract extends Erc721 {
     }
     async getNftItemByTokenId(id: number, others = {}): Promise<INftItem> {
         const tokenUrl = await this._tokenURI(id);
-        console.log(tokenUrl);
         const urlMetadata = IpfsHelper.parseToGateway(
             tokenUrl,
             getDesiredGateWay()
@@ -53,7 +52,6 @@ export default class NftContract extends Erc721 {
     }
     async getListNfts(walletAddress: string): Promise<INftItem[]> {
         const ids = await this._listTokenIds(walletAddress);
-        console.log("ids", ids);
         return Promise.all(
             ids.map(async (id: number) => {
                 return await this.getNftItemByTokenId(id);
@@ -61,7 +59,6 @@ export default class NftContract extends Erc721 {
         );
     }
     async getNftInfo(nfts: Array<any>): Promise<INftItem[]> {
-        console.log(nfts);
         return Promise.all(
             nfts.map(async (nft: any) => {
                 return await this.getNftItemByTokenId(nft.tokenId, nft);
@@ -74,7 +71,6 @@ export default class NftContract extends Erc721 {
         return Promise.all(
             nftsAuctions.map(async (o: IAuctionInfo) => {
                 const tokenUrl = await this._tokenURI(o.id);
-                console.log("Token url", tokenUrl);
                 const metadata = await this.fetchMetadata(tokenUrl);
                 const item: IAuctionInfo = { ...o, ...metadata, id: o.tokenId };
                 return item;
