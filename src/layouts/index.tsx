@@ -1,4 +1,5 @@
 import { ConnectWallet, WalletInfo } from "@/components";
+import SwitchNetwork from "@/components/SwitchNetwork";
 import { menus } from "@/constants";
 import { HamburgerIcon } from "@chakra-ui/icons";
 import {
@@ -37,10 +38,15 @@ export default function MainLayout({ children }: IProps) {
     }, [asPath]);
 
     return (
-        <Box w="100vw" h="100vh" flexDirection="column" padding={{base: "50px 20px" , lg:"50px"}}>
+        <Box
+            w="100vw"
+            h="100vh"
+            flexDirection="column"
+            padding={{ base: "50px 20px", lg: "50px" }}
+        >
             <Flex gap="10px">
                 <Heading
-					color="#fedf56"
+                    color="#fedf56"
                     fontWeight="bold"
                     fontSize={{ base: "20px", lg: "30px" }}
                 >
@@ -65,9 +71,7 @@ export default function MainLayout({ children }: IProps) {
             </Flex>
 
             <Flex flexDirection="column" mt="10px">
-                <Heading
-                    fontSize={{ base: "18px", lg: "25px" }}
-                >
+                <Heading fontSize={{ base: "18px", lg: "25px" }}>
                     {currentMenu.header}
                 </Heading>
                 <Divider my="10px" />

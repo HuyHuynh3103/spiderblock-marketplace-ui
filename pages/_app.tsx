@@ -26,7 +26,9 @@ const supportChains = [bscTestnet, bsc];
 const { provider, chains, webSocketProvider } = configureChains(
     supportChains,
     (() => {
-        let providers: any = [];
+		let providers: any = [];
+		providers.push(publicProvider());
+		providers.push(w3mProvider({ projectId }));
         if (process.env.NEXT_PUBLIC_INFURA_KEY) {
             providers.push(
                 infuraProvider({
@@ -41,8 +43,6 @@ const { provider, chains, webSocketProvider } = configureChains(
                 })
             );
         }
-        providers.push(publicProvider());
-        providers.push(w3mProvider({ projectId }));
         return providers;
     })()
 );

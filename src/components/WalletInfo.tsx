@@ -11,6 +11,7 @@ import {
     PopoverArrow,
 } from "@chakra-ui/react";
 import SpiderBlockTokenContract from "@/contracts/SpiderBlockTokenContract";
+import SwitchNetwork from "./SwitchNetwork";
 export default function WalletInfo() {
     const { address } = useAccount();
     const { data } = useBalance({ address });
@@ -48,6 +49,7 @@ export default function WalletInfo() {
                 </Button>
             </PopoverTrigger>
             <PopoverContent>
+                <SwitchNetwork />
                 <PopoverArrow />
                 <PopoverBody>
                     Balance: {numberFormat(data?.formatted ?? 0)} {data?.symbol}
