@@ -29,20 +29,20 @@ const { provider, chains, webSocketProvider } = configureChains(
 		let providers: any = [];
 		providers.push(publicProvider());
 		providers.push(w3mProvider({ projectId }));
-        if (process.env.NEXT_PUBLIC_INFURA_KEY) {
-            providers.push(
-                infuraProvider({
-                    apiKey: process.env.NEXT_PUBLIC_INFURA_KEY,
-                })
-            );
-        }
-        if (process.env.NEXT_PUBLIC_ALCHEMY_KEY) {
-            providers.push(
-                alchemyProvider({
-                    apiKey: process.env.NEXT_PUBLIC_ALCHEMY_KEY,
-                })
-            );
-        }
+        // if (process.env.NEXT_PUBLIC_INFURA_KEY) {
+        //     providers.push(
+        //         infuraProvider({
+        //             apiKey: process.env.NEXT_PUBLIC_INFURA_KEY,
+        //         })
+        //     );
+        // }
+        // if (process.env.NEXT_PUBLIC_ALCHEMY_KEY) {
+        //     providers.push(
+        //         alchemyProvider({
+        //             apiKey: process.env.NEXT_PUBLIC_ALCHEMY_KEY,
+        //         })
+        //     );
+        // }
         return providers;
     })()
 );
