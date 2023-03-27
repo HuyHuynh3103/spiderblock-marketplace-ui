@@ -23,29 +23,10 @@ const projectId = process.env.NEXT_PUBLIC_PROJECT_ID;
 
 // 2. Configure wagmi client
 const supportChains = [bscTestnet, bsc];
-const { provider, chains, webSocketProvider } = configureChains(
-    supportChains,
-    (() => {
-		let providers: any = [];
-		providers.push(publicProvider());
-		providers.push(w3mProvider({ projectId }));
-        // if (process.env.NEXT_PUBLIC_INFURA_KEY) {
-        //     providers.push(
-        //         infuraProvider({
-        //             apiKey: process.env.NEXT_PUBLIC_INFURA_KEY,
-        //         })
-        //     );
-        // }
-        // if (process.env.NEXT_PUBLIC_ALCHEMY_KEY) {
-        //     providers.push(
-        //         alchemyProvider({
-        //             apiKey: process.env.NEXT_PUBLIC_ALCHEMY_KEY,
-        //         })
-        //     );
-        // }
-        return providers;
-    })()
-);
+const { provider, chains, webSocketProvider } = configureChains(supportChains, [
+    w3mProvider({ projectId }),
+    publicProvider(),
+]);
 const wagmiClient = createClient({
     autoConnect: true,
     connectors: w3mConnectors({ version: 1, chains, projectId }),
@@ -64,15 +45,15 @@ export default function App({ Component, pageProps }: AppProps) {
     }, []);
     return (
         <>
-            <WagmiConfig client={wagmiClient}>
-                <ChakraProvider theme={theme}>
+            <ChakraProvider theme={theme}>
+                <WagmiConfig client={wagmiClient}>
                     {ready ? (
                         <MainLayout>
                             <Component {...pageProps} />
                         </MainLayout>
                     ) : null}
-                </ChakraProvider>
-            </WagmiConfig>
+                </WagmiConfig>
+            </ChakraProvider>
             <Web3Modal projectId={projectId} ethereumClient={ethereumClient} />
         </>
     );
